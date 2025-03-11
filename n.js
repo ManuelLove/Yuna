@@ -250,7 +250,7 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 						this.waktusholat[sholat] = jamSholat
 						for (const [idnya, settings] of Object.entries(db.groups)) {
 							if (settings.waktusholat) {
-								await naze.sendMessage(idnya, { text: `Waktu *${sholat}* telah tiba, ambilah air wudhu dan segeralah shalat🙂.\n\n*${waktu.slice(0, 5)}*\n_untuk wilayah Jakarta dan sekitarnya._` }, { ephemeralExpiration: m.expiration || 0 }).catch(e => {})
+								await naze.sendMessage(idnya, { text: `Tiempo *${sholat}* ha llegado, toma agua de abluciones y reza inmediatamente🙂.\n\n*${waktu.slice(0, 5)}*\n_para el área de Yakarta y sus alrededores._` }, { ephemeralExpiration: m.expiration || 0 }).catch(e => {})
 							}
 						}
 					}
@@ -275,10 +275,10 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 			}
 			if (!isSurrender && 1 > (ok = room.game.turn(m.sender === room.game.playerO, parseInt(m.text) - 1))) {
 				m.reply({
-					'-3': 'Game telah berakhir',
-					'-2': 'Invalid',
-					'-1': 'Posisi Invalid',
-					0: 'Posisi Invalid',
+					'-3': 'el juego ha terminado,
+					'-2': 'Inválido',
+					'-1': 'Posición no válida',
+					0: 'Posición no válida',
 				}[ok])
 				return !0
 			}
@@ -308,7 +308,7 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 				db.users[m.sender].limit += 3
 				db.users[m.sender].uang += 3000
 			}
-			let str = `Room ID: ${room.id}\n\n${arr.slice(0, 3).join('')}\n${arr.slice(3, 6).join('')}\n${arr.slice(6).join('')}\n\n${isWin ? `@${winner.split('@')[0]} Menang!` : isTie ? `Game berakhir` : `Giliran ${['❌', '⭕'][1 * room.game._currentTurn]} (@${room.game.currentTurn.split('@')[0]})`}\n❌: @${room.game.playerX.split('@')[0]}\n⭕: @${room.game.playerO.split('@')[0]}\n\nEscribe *rendirse* para rendirte y aceptar la derrota`
+			let str = `ID de habitación: ${room.id}\n\n${arr.slice(0, 3).join('')}\n${arr.slice(3, 6).join('')}\n${arr.slice(6).join('')}\n\n${isWin ? `@${winner.split('@')[0]} ¡Ganar!` : isTie ? `Juego terminado` : `Doblar ${['❌', '⭕'][1 * room.game._currentTurn]} (@${room.game.currentTurn.split('@')[0]})`}\n❌: @${room.game.playerX.split('@')[0]}\n⭕: @${room.game.playerO.split('@')[0]}\n\nEscribe *rendirse* para rendirte y aceptar la derrota`
 			if ((room.game._currentTurn ^ isSurrender ? room.x : room.o) !== m.chat)
 			room[room.game._currentTurn ^ isSurrender ? 'x' : 'o'] = m.chat
 			if (room.x !== room.o) await naze.sendMessage(room.x, { text: str, mentions: parseMention(str) }, { quoted: m })
@@ -323,23 +323,23 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 		if (roof) {
 			let win = ''
 			let tie = false
-			if (m.sender == roof.p2 && /^(acc(ept)?|terima|gas|oke?|tolak|gamau|nanti|ga(k.)?bisa|y)/i.test(m.text) && m.isGroup && roof.status == 'wait') {
+			if (m.sender == roof.p2 && /^(acc(ept)?|terima|gas|oke?|tolak|gamau|nanti|ga(k.)?bisa|y)/i.test(m.text) && m.isGroup && roof.status == 'esperar') {
 				if (/^(tolak|gamau|nanti|n|ga(k.)?bisa)/i.test(m.text)) {
-					m.reply(`@${roof.p2.split`@`[0]} menolak suit,\nsuit dibatalkan`)
+					m.reply(`@${roof.p2.split`@`[0]} rechazar suit,\nsuit cancelado`)
 					delete suit[roof.id]
 					return !0
 				}
 				roof.status = 'play';
 				roof.asal = m.chat;
 				clearTimeout(roof.waktu);
-				m.reply(`Suit telah dikirimkan ke chat\n\n@${roof.p.split`@`[0]} dan @${roof.p2.split`@`[0]}\n\nSilahkan pilih suit di chat masing-masing klik https://wa.me/${botNumber.split`@`[0]}`)
-				if (!roof.pilih) naze.sendMessage(roof.p, { text: `Silahkan pilih \n\nBatu🗿\nKertas📄\nGunting✂️` }, { quoted: m })
-				if (!roof.pilih2) naze.sendMessage(roof.p2, { text: `Silahkan pilih \n\nBatu🗿\nKertas📄\nGunting✂️` }, { quoted: m })
+				m.reply(`Suit ha sido enviado al chat\n\n@${roof.p.split`@`[0]} Y @${roof.p2.split`@`[0]}\n\nPor favor seleccione un suit en el chat en cada clic https://wa.me/${botNumber.split`@`[0]}`)
+				if (!roof.pilih) naze.sendMessage(roof.p, { text: `Por favor seleccione \n\nPiedra🗿\nPapel📄\nTijeras✂️` }, { quoted: m })
+				if (!roof.pilih2) naze.sendMessage(roof.p2, { text: `Por favor seleccione \n\nPiedra🗿\nPapel📄\nTijeras✂️` }, { quoted: m })
 				roof.waktu_milih = setTimeout(() => {
-					if (!roof.pilih && !roof.pilih2) m.reply(`Kedua pemain tidak niat main,\nSuit dibatalkan`)
+					if (!roof.pilih && !roof.pilih2) m.reply(`Ambos jugadores no tienen intención de jugar,\nSuit cancelado`)
 					else if (!roof.pilih || !roof.pilih2) {
 						win = !roof.pilih ? roof.p2 : roof.p
-						m.reply(`@${(roof.pilih ? roof.p2 : roof.p).split`@`[0]} tidak memilih suit, game berakhir`)
+						m.reply(`@${(roof.pilih ? roof.p2 : roof.p).split`@`[0]} no elijas un suit, el juego termina`)
 					}
 					delete suit[roof.id]
 					return !0
@@ -355,13 +355,13 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 			if (jwb && reg.test(m.text) && !roof.pilih && !m.isGroup) {
 				roof.pilih = reg.exec(m.text.toLowerCase())[0];
 				roof.text = m.text;
-				m.reply(`Kamu telah memilih ${m.text} ${!roof.pilih2 ? `\n\nEsperando que el oponente elija` : ''}`);
+				m.reply(`tu has elegido ${m.text} ${!roof.pilih2 ? `\n\nEsperando que el oponente elija` : ''}`);
 				if (!roof.pilih2) naze.sendMessage(roof.p2, { text: '_El oponente ya ha elegido_\nAhora es tu turno' })
 			}
 			if (jwb2 && reg.test(m.text) && !roof.pilih2 && !m.isGroup) {
 				roof.pilih2 = reg.exec(m.text.toLowerCase())[0]
 				roof.text2 = m.text
-				m.reply(`Kamu telah memilih ${m.text} ${!roof.pilih ? `\n\nEsperando que el oponente elija` : ''}`)
+				m.reply(`tu has elegido ${m.text} ${!roof.pilih ? `\n\nEsperando que el oponente elija` : ''}`)
 				if (!roof.pilih) naze.sendMessage(roof.p, { text: '_El oponente ya ha elegido_\nAhora es tu turno' })
 			}
 			let stage = roof.pilih
@@ -377,7 +377,7 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 				else if (stage == stage2) tie = true
 				db.users[roof.p == win ? roof.p : roof.p2].limit += tie ? 0 : 3
 				db.users[roof.p == win ? roof.p : roof.p2].uang += tie ? 0 : 3000
-				naze.sendMessage(roof.asal, { text: `_*Hasil Suit*_${tie ? '\nSERI' : ''}\n\n@${roof.p.split`@`[0]} (${roof.text}) ${tie ? '' : roof.p == win ? ` Menang \n` : ` Kalah \n`}\n@${roof.p2.split`@`[0]} (${roof.text2}) ${tie ? '' : roof.p2 == win ? ` Menang \n` : ` Kalah \n`}\n\nPemenang Mendapatkan\n*Hadiah :* Uang(3000) & Limit(3)`.trim(), mentions: [roof.p, roof.p2] }, { quoted: m })
+				naze.sendMessage(roof.asal, { text: `_*Resultados Suit*_${tie ? '\nEmpate' : ''}\n\n@${roof.p.split`@`[0]} (${roof.text}) ${tie ? '' : roof.p == win ? ` Ganar \n` : ` Perdido \n`}\n@${roof.p2.split`@`[0]} (${roof.text2}) ${tie ? '' : roof.p2 == win ? ` Ganar \n` : ` Perdido \n`}\n\nEl ganador obtiene\n*Premio :* Dinero(3000) y límite(3)`.trim(), mentions: [roof.p, roof.p2] }, { quoted: m })
 				delete suit[roof.id]
 			}
 		}
@@ -395,10 +395,10 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 				tebakbom[m.sender].nyawa.pop();
 				let brd = tebakbom[m.sender].board;
 				if (tebakbom[m.sender].nyawa.length < 1) {
-					await m.reply(`*GAME TELAH BERAKHIR*\nKamu terkena bomb\n\n ${brd.join('')}\n\n*Terpilih :* ${tebakbom[m.sender].pick}\n_Pengurangan Limit : 1_`);
+					await m.reply(`*EL JUEGO HA TERMINADO\nFuiste alcanzado por una bomba\n\n ${brd.join('')}\n\n*Seleccionado :* ${tebakbom[m.sender].pick}\n_Reducción de límite : 1_`);
 					naze.sendMessage(m.chat, { react: { text: '😂', key: m.key }})
 					delete tebakbom[m.sender];
-				} else await m.reply(`*PILIH ANGKA*\n\nKamu terkena bomb\n ${brd.join('')}\n\nTerpilih: ${tebakbom[m.sender].pick}\nSisa nyawa: ${tebakbom[m.sender].nyawa}`);
+				} else await m.reply(`*SELECCIONA UN NÚMERO*\n\nFuiste alcanzado por una bomba\n ${brd.join('')}\n\nSeleccionado: ${tebakbom[m.sender].pick}\nVida restante: ${tebakbom[m.sender].nyawa}`);
 				return !0;
 			}
 			if (tebakbom[m.sender].petak[parseInt(body) - 1] === 0) {
@@ -409,9 +409,9 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 				let brd = tebakbom[m.sender].board;
 				if (tebakbom[m.sender].lolos < 1) {
 					db.users[m.sender].uang += 6000
-					await m.reply(`*KAMU HEBAT ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Terpilih :* ${tebakbom[m.sender].pick}\n*Sisa nyawa :* ${tebakbom[m.sender].nyawa}\n*Bomb :* ${tebakbom[m.sender].bomb}\nBonus Uang 💰 *+6000*`);
+					await m.reply(`*ERES GRANDE ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Seleccionado :* ${tebakbom[m.sender].pick}\n*Vida restante :* ${tebakbom[m.sender].nyawa}\n*Bomba :* ${tebakbom[m.sender].bomb}\nBonificaciones Dinero 💰 *+6000*`);
 					delete tebakbom[m.sender];
-				} else m.reply(`*PILIH ANGKA*\n\n${brd.join('')}\n\nTerpilih : ${tebakbom[m.sender].pick}\nSisa nyawa : ${tebakbom[m.sender].nyawa}\nBomb : ${tebakbom[m.sender].bomb}`)
+				} else m.reply(`*SELECCIONA UN NÚMERO*\n\n${brd.join('')}\n\nSeleccionado : ${tebakbom[m.sender].pick}\nVida restante : ${tebakbom[m.sender].nyawa}\nBomba : ${tebakbom[m.sender].bomb}`)
 			}
 		}
 		
