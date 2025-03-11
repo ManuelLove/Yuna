@@ -275,7 +275,7 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 			}
 			if (!isSurrender && 1 > (ok = room.game.turn(m.sender === room.game.playerO, parseInt(m.text) - 1))) {
 				m.reply({
-					'-3': 'el juego ha terminado,
+					'-3': 'el juego ha terminado',
 					'-2': 'Inválido',
 					'-1': 'Posición no válida',
 					0: 'Posición no válida',
