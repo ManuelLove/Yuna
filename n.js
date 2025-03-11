@@ -323,7 +323,7 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 		if (roof) {
 			let win = ''
 			let tie = false
-			if (m.sender == roof.p2 && /^(acc(ept)?|terima|gas|oke?|tolak|gamau|nanti|ga(k.)?bisa|y)/i.test(m.text) && m.isGroup && roof.status == 'esperar') {
+			if (m.sender == roof.p2 && /^(acc(ept)?|terima|gas|oke?|tolak|gamau|nanti|ga(k.)?bisa|y)/i.test(m.text) && m.isGroup && roof.status == 'wait') {
 				if (/^(tolak|gamau|nanti|n|ga(k.)?bisa)/i.test(m.text)) {
 					m.reply(`@${roof.p2.split`@`[0]} rechazar suit,\nsuit cancelado`)
 					delete suit[roof.id]
