@@ -24,11 +24,11 @@ global.blockList = []
 
 //---------[ NOMBRE/INFO ]---------
 global.pagina = "https://ansibot.netlify.app/"
-global.botname = "✨ 𝐚𝐧𝐬í-𝐁𝐎𝐓 ✨"
-global.wm = '✨ 𝐚𝐧𝐬í-𝐁𝐎𝐓 ✨'
+global.botname = "✨ Nury-Bot ✨"
+global.wm = '✨ Nury-Bot ✨'
 global.vs = '𝟮.𝟭'
-global.creador = '𝐸𝐿𝐼𝐴𝑆𝐴𝑅 𝑌𝑇'
-global.creador2 = 'ELIASAR YT'
+global.creador = 'Techfix Solutions'
+global.creador2 = 'ManuDiaz'
 global.nunber = Math.floor(Math.random() * (27 - 18 + 1)) + 18;
 
 function pickRandom(array) {
