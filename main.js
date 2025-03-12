@@ -1678,32 +1678,13 @@ break;
         game(m, budy, command, text, pickRandom, pushname, conn, participants, sender, who, body, sendImageAsUrl);
         break;
 
-    // 🎰 Casino - Ruletas y Juegos de Suerte (Usando EXP en lugar de EXP)
-    case 'ruleta':
-    case 'ruletas':
-    case 'suerte':
-    case 'casino':
-        if (!global.db.data.users[m.sender]) {
-            global.db.data.users[m.sender] = { exp: 0 }; // Inicializa EXP si no existe
-        }
-        
-        let apuesta = parseInt(args[0]);
-        if (isNaN(apuesta) || apuesta <= 0) return m.reply('❌ Ingresa una cantidad válida de EXP para apostar.');
-
-        let userExp = global.db.data.users[m.sender].exp;
-        if (apuesta > userExp) return m.reply('❌ No tienes suficiente EXP para apostar.');
-
-        let resultado = Math.random() < 0.5 ? 'ganaste' : 'perdiste';
-        let expGanado = Math.floor(Math.random() * 500) + 200; // Rango de 200 a 500 EXP
-
-        if (resultado === 'ganaste') {
-            global.db.data.users[m.sender].exp += expGanado;
-            m.reply(`🎉 ¡Ganaste en el casino! Has ganado *${expGanado} EXP*.`);
-        } else {
-            global.db.data.users[m.sender].exp -= apuesta;
-            m.reply(`😢 Perdiste *${apuesta} EXP* en el casino.`);
-        }
-        break;
+// 🎰 Casino - Ruletas y Juegos de Suerte (Usando EXP en lugar de dinero)
+case 'ruleta':
+case 'ruletas':
+case 'suerte':
+case 'casino':
+    gameCasinoSolo(conn, m, prefix, db); // Ahora usa la función de game.js
+    break;
     break
 case 'verdad':
 case 'reto':
