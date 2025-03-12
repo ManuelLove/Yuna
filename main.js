@@ -161,7 +161,7 @@ enable
 db.game = db.game || {}; // Asegura que db.game exista
 db.game.suitpvp = db.game.suitpvp || []; // Asegura que suitpvp exista
 let suitpvp = db.game.suitpvp;
-let tebakbom = db.game.tebakbom = []
+let boom = db.game.boom = []
 let user = global.db.data.users[m.sender]
 let tebaklagu = global.db.data.game.tebaklagu = []
 let kuismath = global.db.data.game.math = []
@@ -1025,7 +1025,7 @@ if (roof) {
 		
 // Tebak Bomb (Ahora usa Dinero en lugar de EXP)
 let pilih = '🌀', bomb = '💣';
-if (m.sender in tebakbom) {
+if (m.sender in boom) {
     if (!/^[1-9]|10$/i.test(body) && !isCmd && !isCreator) return !0;
 
     // ✅ Asegurar que el usuario esté registrado antes de modificar su dinero
@@ -1035,17 +1035,17 @@ if (m.sender in tebakbom) {
 
     let selectedIndex = parseInt(body) - 1;
 
-    if (tebakbom[m.sender].petak[selectedIndex] === 2) {
-        tebakbom[m.sender].board[selectedIndex] = bomb;
-        tebakbom[m.sender].nyawa.pop(); // Reduce la vida
-        tebakbom[m.sender].bomb--; // 🔥 Ahora se reduce correctamente el número de bombas restantes
+    if (boom[m.sender].petak[selectedIndex] === 2) {
+        boom[m.sender].board[selectedIndex] = bomb;
+        boom[m.sender].nyawa.pop(); // Reduce la vida
+        boom[m.sender].bomb--; // 🔥 Ahora se reduce correctamente el número de bombas restantes
 
-        let vidasRestantes = '❤️'.repeat(tebakbom[m.sender].nyawa.length);
-        let bombasRestantes = tebakbom[m.sender].bomb;
-        let casillasAbiertas = tebakbom[m.sender].pick; // 🔥 Llevar la cuenta de cuántas casillas se han abierto
-        let brd = tebakbom[m.sender].board.join('');
+        let vidasRestantes = '❤️'.repeat(boom[m.sender].nyawa.length);
+        let bombasRestantes = boom[m.sender].bomb;
+        let casillasAbiertas = boom[m.sender].pick; // 🔥 Llevar la cuenta de cuántas casillas se han abierto
+        let brd = boom[m.sender].board.join('');
 
-        if (tebakbom[m.sender].nyawa.length < 1) {
+        if (boom[m.sender].nyawa.length < 1) {
             let dineroPerdido = Math.floor(Math.random() * 500) + 200; // Rango de pérdida: 200 a 500 dinero
             global.db.data.users[m.sender].money = Math.max(0, global.db.data.users[m.sender].money - dineroPerdido);
 
@@ -1059,7 +1059,7 @@ Vida restante: ${vidasRestantes}
 Bombas restantes: ${bombasRestantes}
 ⚠️ *Has perdido ${dineroPerdido} Dinero*`);
 
-            delete tebakbom[m.sender]; // Eliminar la partida después de perder
+            delete boom[m.sender]; // Eliminar la partida después de perder
         } else {
             await m.reply(`*SELECCIONA UN NÚMERO*
 
@@ -1070,22 +1070,22 @@ ${brd}
 Vida restante: ${vidasRestantes}
 Bombas restantes: ${bombasRestantes}`);
         }
-    } else if (tebakbom[m.sender].petak[selectedIndex] === 0) {
-        tebakbom[m.sender].petak[selectedIndex] = 1;
-        tebakbom[m.sender].board[selectedIndex] = pilih;
-        tebakbom[m.sender].lolos--;
-        tebakbom[m.sender].pick++; // 🔥 Sumar casilla abierta
+    } else if (boom[m.sender].petak[selectedIndex] === 0) {
+        boom[m.sender].petak[selectedIndex] = 1;
+        boom[m.sender].board[selectedIndex] = pilih;
+        boom[m.sender].lolos--;
+        boom[m.sender].pick++; // 🔥 Sumar casilla abierta
 
-        let vidasRestantes = '❤️'.repeat(tebakbom[m.sender].nyawa.length);
-        let bombasRestantes = tebakbom[m.sender].bomb;
-        let casillasAbiertas = tebakbom[m.sender].pick;
-        let brd = tebakbom[m.sender].board.join('');
+        let vidasRestantes = '❤️'.repeat(boom[m.sender].nyawa.length);
+        let bombasRestantes = boom[m.sender].bomb;
+        let casillasAbiertas = boom[m.sender].pick;
+        let brd = boom[m.sender].board.join('');
 
-        if (tebakbom[m.sender].lolos < 1) {
+        if (boom[m.sender].lolos < 1) {
             let dineroGanado = Math.floor(Math.random() * 1000) + 500; // Rango de ganancia: 500 a 1000 dinero
             global.db.data.users[m.sender].money += dineroGanado;
 
-            await m.reply(`*¡Eres un maestro del TebakBom! 🎉*
+            await m.reply(`*¡Eres un maestro del boom! 🎉*
 
 ${brd}
 
@@ -1094,7 +1094,7 @@ Vida restante: ${vidasRestantes}
 Bombas restantes: ${bombasRestantes}
 🎖 *Has ganado ${dineroGanado} Dinero*`);
 
-            delete tebakbom[m.sender]; // Eliminar la partida después de ganar
+            delete boom[m.sender]; // Eliminar la partida después de ganar
         } else {
             await m.reply(`*SELECCIONA UN NÚMERO*
 
@@ -1793,9 +1793,9 @@ break
 				}
 			}
 			break
-			case 'tebakbom': {
-				if (tebakbom[m.sender]) return m.reply('¡Aún quedan sesiones sin terminar!')
-				tebakbom[m.sender] = {
+			case 'boom': {
+				if (boom[m.sender]) return m.reply('¡Aún quedan sesiones sin terminar!')
+				boom[m.sender] = {
 					petak: [0, 0, 0, 2, 0, 2, 0, 2, 0, 0].sort(() => Math.random() - 0.5),
 					board: ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'],
 					bomb: 3,
@@ -1803,11 +1803,11 @@ break
 					pick: 0,
 					nyawa: ['❤️', '❤️', '❤️'],
 					waktu: setTimeout(() => {
-						if (tebakbom[m.sender]) m.reply(`_Waktu ${command} habis_`)
-						delete tebakbom[m.sender];
+						if (boom[m.sender]) m.reply(`_Waktu ${command} habis_`)
+						delete boom[m.sender];
 					}, 160000)
 				}
-				m.reply(`*ADIVINA LA BOMBA*\n\n${tebakbom[m.sender].board.join("")}\n\n¡Elige ese número! ¡Y no te dejes alcanzar por una bomba!\nBomba : ${tebakbom[m.sender].bomb}\nVida : ${tebakbom[m.sender].nyawa.join("")}`);
+				m.reply(`*ADIVINA LA BOMBA*\n\n${boom[m.sender].board.join("")}\n\n¡Elige ese número! ¡Y no te dejes alcanzar por una bomba!\nBomba : ${boom[m.sender].bomb}\nVida : ${boom[m.sender].nyawa.join("")}`);
 			}
 			break
 			case 'tekateki': {
