@@ -2609,7 +2609,7 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 						}, 300000)
 					}
 					if (text) room.name = text
-					naze.sendMessage(m.chat, { text: 'Menunggu partner' + (text ? ` mengetik command dibawah ini ${prefix}${command} ${text}` : ''), mentions: m.mentionedJid }, { quoted: m })
+					naze.sendMessage(m.chat, { text: 'esperando socios' + (text ? ` escriba el comando a continuación ${prefix}${command} ${text}` : ''), mentions: m.mentionedJid }, { quoted: m })
 					tictactoe[room.id] = room
 				}
 			}
