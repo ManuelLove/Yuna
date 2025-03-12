@@ -942,96 +942,103 @@ if (isWin)
 users[winner].exp += winScore - playScore
 }
 }
-// 🎮 Suit PvP - Ahora avisa cuando el oponente elige y muestra el resultado
-let roof = Object.values(suitpvp).find(roof => roof.id && roof.status && [roof.p, roof.p2].includes(m.sender));
-if (roof) {
-    let win = '';
-    let tie = false;
-    if (m.sender == roof.p2 && /^(aceptar|ok|yes|si)$/i.test(m.text) && m.isGroup && roof.status == 'wait') {
-        roof.status = 'play';
-        roof.asal = m.chat;
-        clearTimeout(roof.waktu);
-        m.reply(`Suit ha sido enviado al chat\n\n@${roof.p.split`@`[0]} y @${roof.p2.split`@`[0]}\n\nPor favor seleccionen su jugada.`);
-        
-        await conn.sendMessage(roof.p, { text: `🗿 Piedra\n📄 Papel\n✂️ Tijeras\n\nEscribe una opción para jugar.` }, { quoted: m });
-        await conn.sendMessage(roof.p2, { text: `🗿 Piedra\n📄 Papel\n✂️ Tijeras\n\nEscribe una opción para jugar.` }, { quoted: m });
+// 🎮 Suit PvP - Verifica registro y muestra resultados correctamente
+case 'suitpvp': {
+    let roof = Object.values(suitpvp).find(roof => roof.id && roof.status && [roof.p, roof.p2].includes(m.sender));
+    if (roof) {
+        let win = '';
+        let tie = false;
 
-        roof.waktu_milih = setTimeout(() => {
-            if (!roof.pilih && !roof.pilih2) {
-                m.reply(`⏳ *Tiempo agotado* - Nadie eligió, juego cancelado.`);
-            } else if (!roof.pilih || !roof.pilih2) {
-                let quienNoEligio = !roof.pilih ? roof.p : roof.p2;
-                m.reply(`❌ @${quienNoEligio.split`@`[0]} no eligió a tiempo, juego cancelado.`);
-            }
+        // 🔥 Verificar si los jugadores están registrados antes de jugar
+        if (!db.users[roof.p] || !db.users[roof.p2]) {
+            m.reply(`❌ Uno o ambos jugadores no están registrados. Usa *".reg tuNombre.edad"* para registrarte.`);
             delete suitpvp[roof.id];
-            return !0;
-        }, roof.timeout);
-    }
-    
-    let jugador1 = m.sender == roof.p;
-    let jugador2 = m.sender == roof.p2;
-    let reg = /^(tijeras|piedra|papel)/i;
-    
-    if (jugador1 && reg.test(m.text) && !roof.pilih) {
-        roof.pilih = reg.exec(m.text.toLowerCase())[0];
-        m.reply(`✅ Has elegido *${roof.pilih}*.\n\n⏳ Esperando a que tu oponente elija...`);
-        await conn.sendMessage(roof.p2, { text: `⚠️ *Tu oponente ya eligió*.\nAhora elige tu opción: 🗿 Piedra, 📄 Papel, ✂️ Tijeras.` }, { quoted: m });
-    }
-    
-    if (jugador2 && reg.test(m.text) && !roof.pilih2) {
-        roof.pilih2 = reg.exec(m.text.toLowerCase())[0];
-        m.reply(`✅ Has elegido *${roof.pilih2}*.\n\n⏳ Esperando a que se procesen los resultados...`);
-        await conn.sendMessage(roof.p, { text: `⚠️ *Tu oponente ya eligió*.\nPronto verás los resultados.` }, { quoted: m });
-    }
-
-    if (roof.pilih && roof.pilih2) {
-        clearTimeout(roof.waktu_milih);
-
-        let stage1 = roof.pilih;
-        let stage2 = roof.pilih2;
-        
-        if ((stage1 === "piedra" && stage2 === "tijeras") ||
-            (stage1 === "tijeras" && stage2 === "papel") ||
-            (stage1 === "papel" && stage2 === "piedra")) {
-            win = roof.p;
-        } else if (stage1 === stage2) {
-            tie = true;
-        } else {
-            win = roof.p2;
+            return;
         }
 
-        // **Recompensas**
-        let premioDinero = 1000;
-        let expGanador = 5;
-        let expPerdedor = 3;
+        if (m.sender == roof.p2 && /^(aceptar|ok|yes|si)$/i.test(m.text) && m.isGroup && roof.status == 'wait') {
+            roof.status = 'play';
+            roof.asal = m.chat;
+            clearTimeout(roof.waktu);
+            m.reply(`🆚 *Suit PvP Iniciado*\n\n👤 @${roof.p.split`@`[0]} vs 👤 @${roof.p2.split`@`[0]}\n\n📩 ¡Elijan su jugada!`);
 
-        if (!tie) {
-            // Verificar que los jugadores estén en la base de datos
-            if (!db.users[win]) db.users[win] = { exp: 0, money: 0 };
-            let perdedor = win === roof.p ? roof.p2 : roof.p;
-            if (!db.users[perdedor]) db.users[perdedor] = { exp: 0, money: 0 };
+            await conn.sendMessage(roof.p, { text: `🗿 Piedra\n📄 Papel\n✂️ Tijeras\n\nEscribe una opción para jugar.` }, { quoted: m });
+            await conn.sendMessage(roof.p2, { text: `🗿 Piedra\n📄 Papel\n✂️ Tijeras\n\nEscribe una opción para jugar.` }, { quoted: m });
 
-            db.users[win].money += premioDinero; // Gana dinero
-            db.users[win].exp += expGanador; // Gana EXP
-            db.users[perdedor].exp = Math.max(0, db.users[perdedor].exp - expPerdedor); // Pierde EXP
+            roof.waktu_milih = setTimeout(() => {
+                if (!roof.pilih && !roof.pilih2) {
+                    m.reply(`⏳ *Tiempo agotado* - Nadie eligió, juego cancelado.`);
+                } else if (!roof.pilih || !roof.pilih2) {
+                    let quienNoEligio = !roof.pilih ? roof.p : roof.p2;
+                    m.reply(`❌ @${quienNoEligio.split`@`[0]} no eligió a tiempo, juego cancelado.`);
+                }
+                delete suitpvp[roof.id];
+            }, roof.timeout);
         }
 
-        // **Mostrar resultados en el grupo**
-        let resultadoMsg = `🎮 *Resultados de Suit PvP*\n\n`;
-        resultadoMsg += `👤 @${roof.p.split`@`[0]} eligió: *${roof.pilih}*\n`;
-        resultadoMsg += `👤 @${roof.p2.split`@`[0]} eligió: *${roof.pilih2}*\n\n`;
-        
-        if (tie) {
-            resultadoMsg += `⚖️ *Empate* - Nadie gana ni pierde.`;
-        } else {
-            resultadoMsg += `🏆 *Ganador:* @${win.split`@`[0]}\n💰 *Premio:* ${premioDinero} Dinero, ${expGanador} EXP\n❌ *Perdedor pierde:* ${expPerdedor} EXP`;
+        let jugador1 = m.sender == roof.p;
+        let jugador2 = m.sender == roof.p2;
+        let reg = /^(tijeras|piedra|papel)/i;
+
+        if (jugador1 && reg.test(m.text) && !roof.pilih) {
+            roof.pilih = reg.exec(m.text.toLowerCase())[0];
+            m.reply(`✅ Has elegido *${roof.pilih}*.\n\n⏳ Esperando a que tu oponente elija...`);
+            await conn.sendMessage(roof.p2, { text: `⚠️ *Tu oponente ya eligió*.\nAhora elige tu opción: 🗿 Piedra, 📄 Papel, ✂️ Tijeras.` }, { quoted: m });
         }
 
-        conn.sendMessage(roof.asal, { text: resultadoMsg.trim(), mentions: [roof.p, roof.p2] }, { quoted: m });
-        
-        delete suitpvp[roof.id];
+        if (jugador2 && reg.test(m.text) && !roof.pilih2) {
+            roof.pilih2 = reg.exec(m.text.toLowerCase())[0];
+            m.reply(`✅ Has elegido *${roof.pilih2}*.\n\n⏳ Esperando a que se procesen los resultados...`);
+            await conn.sendMessage(roof.p, { text: `⚠️ *Tu oponente ya eligió*.\nPronto verás los resultados.` }, { quoted: m });
+        }
+
+        if (roof.pilih && roof.pilih2) {
+            clearTimeout(roof.waktu_milih);
+
+            let stage1 = roof.pilih;
+            let stage2 = roof.pilih2;
+
+            if ((stage1 === "piedra" && stage2 === "tijeras") ||
+                (stage1 === "tijeras" && stage2 === "papel") ||
+                (stage1 === "papel" && stage2 === "piedra")) {
+                win = roof.p;
+            } else if (stage1 === stage2) {
+                tie = true;
+            } else {
+                win = roof.p2;
+            }
+
+            // **Recompensas**
+            let premioDinero = 1000;
+            let expGanador = 5;
+            let expPerdedor = 3;
+
+            if (!tie) {
+                let perdedor = win === roof.p ? roof.p2 : roof.p;
+
+                db.users[win].money = (db.users[win].money || 0) + premioDinero; // Gana dinero
+                db.users[win].exp = (db.users[win].exp || 0) + expGanador; // Gana EXP
+                db.users[perdedor].exp = Math.max(0, (db.users[perdedor].exp || 0) - expPerdedor); // Pierde EXP
+            }
+
+            // **Mostrar resultados en el grupo**
+            let resultadoMsg = `🎮 *Resultados de Suit PvP*\n\n`;
+            resultadoMsg += `👤 @${roof.p.split`@`[0]} eligió: *${roof.pilih}*\n`;
+            resultadoMsg += `👤 @${roof.p2.split`@`[0]} eligió: *${roof.pilih2}*\n\n`;
+
+            if (tie) {
+                resultadoMsg += `⚖️ *Empate* - Nadie gana ni pierde.`;
+            } else {
+                resultadoMsg += `🏆 *Ganador:* @${win.split`@`[0]}\n💰 *Premio:* ${premioDinero} Dinero, ${expGanador} EXP\n❌ *Perdedor pierde:* ${expPerdedor} EXP`;
+            }
+
+            conn.sendMessage(roof.asal, { text: resultadoMsg.trim(), mentions: [roof.p, roof.p2] }, { quoted: m });
+
+            delete suitpvp[roof.id];
+        }
     }
 }
+break;
 		
 // Tebak Bomb (Ahora usa Dinero en lugar de EXP)
 let pilih = '🌀', bomb = '💣';
