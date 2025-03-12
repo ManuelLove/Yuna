@@ -1100,9 +1100,6 @@ Bombas restantes: ${bombasRestantes}`);
 
     const gamePath = require.resolve('./libs/game.js');
     const game = require(gamePath);
-
-    const confirmPath = require.resolve('./libs/confirm.js');
-    const confirm = require(confirmPath);
                 if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
 kuis = true
 jawaban = kuismath[m.sender.split('@')[0]]
