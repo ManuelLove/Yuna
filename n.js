@@ -395,7 +395,7 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 				tebakbom[m.sender].nyawa.pop();
 				let brd = tebakbom[m.sender].board;
 				if (tebakbom[m.sender].nyawa.length < 1) {
-					await m.reply(`*EL JUEGO HA TERMINADO\nFuiste alcanzado por una bomba\n\n ${brd.join('')}\n\n*Seleccionado :* ${tebakbom[m.sender].pick}\n_Reducción de límite : 1_`);
+					await m.reply(`*EL JUEGO HA TERMINADO*\nFuiste alcanzado por una bomba\n\n ${brd.join('')}\n\n*Seleccionado :* ${tebakbom[m.sender].pick}\n_Reducción de límite : 1_`);
 					naze.sendMessage(m.chat, { react: { text: '😂', key: m.key }})
 					delete tebakbom[m.sender];
 				} else await m.reply(`*SELECCIONA UN NÚMERO*\n\nFuiste alcanzado por una bomba\n ${brd.join('')}\n\nSeleccionado: ${tebakbom[m.sender].pick}\nVida restante: ${tebakbom[m.sender].nyawa}`);
@@ -2626,14 +2626,14 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 						delete akinator[m.sender];
 					}, 3600000)
 				} else if (text == 'end') {
-					if (!akinator[m.sender]) return m.reply('Kamu tidak Sedang bermain Akinator!')
+					if (!akinator[m.sender]) return m.reply('¡No estás jugando a Akinator!')
 					delete akinator[m.sender];
-					m.reply('Éxito Mengakhiri sessi Akinator')
+					m.reply('Éxito finaliza la sesión de Akinator')
 				} else m.reply(`Example : ${prefix + command} start/end`)
 			}
 			break
 			case 'tebakbom': {
-				if (tebakbom[m.sender]) return m.reply('Masih Ada Sesi Yang Belum Diselesaikan!')
+				if (tebakbom[m.sender]) return m.reply('¡Aún quedan sesiones sin terminar!')
 				tebakbom[m.sender] = {
 					petak: [0, 0, 0, 2, 0, 2, 0, 2, 0, 0].sort(() => Math.random() - 0.5),
 					board: ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'],
@@ -2644,9 +2644,9 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 					waktu: setTimeout(() => {
 						if (tebakbom[m.sender]) m.reply(`_Waktu ${command} habis_`)
 						delete tebakbom[m.sender];
-					}, 120000)
+					}, 160000)
 				}
-				m.reply(`*TEBAK BOM*\n\n${tebakbom[m.sender].board.join("")}\n\nPilih lah nomor tersebut! dan jangan sampai terkena Bom!\nBomb : ${tebakbom[m.sender].bomb}\nNyawa : ${tebakbom[m.sender].nyawa.join("")}`);
+				m.reply(`*ADIVINA LA BOMBA*\n\n${tebakbom[m.sender].board.join("")}\n\n¡Elige ese número! ¡Y no te dejes alcanzar por una bomba!\nBomba : ${tebakbom[m.sender].bomb}\nVida : ${tebakbom[m.sender].nyawa.join("")}`);
 			}
 			break
 			case 'tekateki': {
