@@ -1795,15 +1795,15 @@ break
 switch (command) {
     case 'casino':
         // Código del casino...
-        break;
+        break; // 👈 Asegúrate de que haya un "break" aquí
 
     case 'suitpvp': { // Aquí comienza suitpvp
         let roof = Object.values(suitpvp).find(roof => roof.id && roof.status && [roof.p, roof.p2].includes(m.sender));
         if (roof) {
-            // Código corregido de SuitPvP
+            // Código de Suit PvP aquí...
         }
     }
-    break; // 👈 Asegúrate de que suitpvp tenga este "break"
+    break; // 👈 Asegúrate de que haya un "break" después de suitpvp
 }
 case 'boom': {
     if (boom[m.sender]) return m.reply('¡Aún quedan sesiones sin terminar!')
