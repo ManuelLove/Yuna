@@ -1006,93 +1006,89 @@ users[winner].exp += winScore - playScore
 			}
 		}
 		
-		// Tebak Bomb
+// Tebak Bomb (Ahora usa Dinero en lugar de EXP)
+let pilih = '🌀', bomb = '💣';
+if (m.sender in tebakbom) {
+    if (!/^[1-9]|10$/i.test(body) && !isCmd && !isCreator) return !0;
 
+    // ✅ Asegurar que el usuario esté registrado antes de modificar su dinero
+    if (!global.db.data.users[m.sender]) {
+        global.db.data.users[m.sender] = { exp: 0, money: 0 }; // Inicializa el usuario si no existe
+    }
 
+    let selectedIndex = parseInt(body) - 1;
 
+    if (tebakbom[m.sender].petak[selectedIndex] === 2) {
+        tebakbom[m.sender].board[selectedIndex] = bomb;
+        tebakbom[m.sender].nyawa.pop(); // Reduce la vida
+        tebakbom[m.sender].bomb--; // 🔥 Ahora se reduce correctamente el número de bombas restantes
 
-    let pilih = '🌀', bomb = '💣';
-    if (m.sender in tebakbom) {
-        if (!/^[1-9]|10$/i.test(body) && !isCmd && !isCreator) return !0;
+        let vidasRestantes = '❤️'.repeat(tebakbom[m.sender].nyawa.length);
+        let bombasRestantes = tebakbom[m.sender].bomb;
+        let casillasAbiertas = tebakbom[m.sender].pick; // 🔥 Llevar la cuenta de cuántas casillas se han abierto
+        let brd = tebakbom[m.sender].board.join('');
 
-        // ✅ Asegurar que el usuario esté registrado antes de modificar su EXP
-        if (!global.db.data.users[m.sender]) {
-            global.db.data.users[m.sender] = { exp: 0 }; // Inicializa el usuario si no existe
+        if (tebakbom[m.sender].nyawa.length < 1) {
+            let dineroPerdido = Math.floor(Math.random() * 500) + 200; // Rango de pérdida: 200 a 500 dinero
+            global.db.data.users[m.sender].money = Math.max(0, global.db.data.users[m.sender].money - dineroPerdido);
+
+            await m.reply(`*SELECCIONA UN NÚMERO*
+
+Fuiste alcanzado por una bomba
+${brd}
+
+*Casillas abiertas:* ${casillasAbiertas}
+Vida restante: ${vidasRestantes}
+Bombas restantes: ${bombasRestantes}
+⚠️ *Has perdido ${dineroPerdido} Dinero*`);
+
+            delete tebakbom[m.sender]; // Eliminar la partida después de perder
+        } else {
+            await m.reply(`*SELECCIONA UN NÚMERO*
+
+Fuiste alcanzado por una bomba
+${brd}
+
+*Casillas abiertas:* ${casillasAbiertas}
+Vida restante: ${vidasRestantes}
+Bombas restantes: ${bombasRestantes}`);
         }
+    } else if (tebakbom[m.sender].petak[selectedIndex] === 0) {
+        tebakbom[m.sender].petak[selectedIndex] = 1;
+        tebakbom[m.sender].board[selectedIndex] = pilih;
+        tebakbom[m.sender].lolos--;
+        tebakbom[m.sender].pick++; // 🔥 Sumar casilla abierta
 
-        let selectedIndex = parseInt(body) - 1;
+        let vidasRestantes = '❤️'.repeat(tebakbom[m.sender].nyawa.length);
+        let bombasRestantes = tebakbom[m.sender].bomb;
+        let casillasAbiertas = tebakbom[m.sender].pick;
+        let brd = tebakbom[m.sender].board.join('');
 
-        if (tebakbom[m.sender].petak[selectedIndex] === 2) {
-            tebakbom[m.sender].board[selectedIndex] = bomb;
-            tebakbom[m.sender].nyawa.pop(); // Reduce la vida
-            tebakbom[m.sender].bomb--; // 🔥 Ahora se reduce correctamente el número de bombas restantes
+        if (tebakbom[m.sender].lolos < 1) {
+            let dineroGanado = Math.floor(Math.random() * 1000) + 500; // Rango de ganancia: 500 a 1000 dinero
+            global.db.data.users[m.sender].money += dineroGanado;
 
-            let vidasRestantes = '❤️'.repeat(tebakbom[m.sender].nyawa.length);
-            let bombasRestantes = tebakbom[m.sender].bomb; // Se actualiza correctamente
-            let casillasAbiertas = tebakbom[m.sender].pick; // 🔥 Llevar la cuenta de cuántas casillas se han abierto
-            let brd = tebakbom[m.sender].board.join('');
-
-            if (tebakbom[m.sender].nyawa.length < 1) {
-                let expPerdido = Math.floor(Math.random() * 200) + 100;
-                global.db.data.users[m.sender].exp = Math.max(0, global.db.data.users[m.sender].exp - expPerdido);
-
-                await m.reply(`*SELECCIONA UN NÚMERO*
-
-Fuiste alcanzado por una bomba
-${brd}
-
-*Casillas abiertas:* ${casillasAbiertas}
-Vida restante: ${vidasRestantes}
-Bombas restantes: ${bombasRestantes}
-⚠️ *Has perdido ${expPerdido} EXP*`);
-
-                delete tebakbom[m.sender]; // Eliminar la partida después de perder
-            } else {
-                await m.reply(`*SELECCIONA UN NÚMERO*
-
-Fuiste alcanzado por una bomba
-${brd}
-
-*Casillas abiertas:* ${casillasAbiertas}
-Vida restante: ${vidasRestantes}
-Bombas restantes: ${bombasRestantes}`);
-            }
-        } else if (tebakbom[m.sender].petak[selectedIndex] === 0) {
-            tebakbom[m.sender].petak[selectedIndex] = 1;
-            tebakbom[m.sender].board[selectedIndex] = pilih;
-            tebakbom[m.sender].lolos--;
-            tebakbom[m.sender].pick++; // 🔥 Sumar casilla abierta
-
-            let vidasRestantes = '❤️'.repeat(tebakbom[m.sender].nyawa.length);
-            let bombasRestantes = tebakbom[m.sender].bomb; // Se mantiene el conteo correcto
-            let casillasAbiertas = tebakbom[m.sender].pick; // 🔥 Mostrar cuántas casillas se han abierto
-            let brd = tebakbom[m.sender].board.join('');
-
-            if (tebakbom[m.sender].lolos < 1) {
-                let expGanado = Math.floor(Math.random() * 600) + 400;
-                global.db.data.users[m.sender].exp += expGanado;
-
-                await m.reply(`*¡Eres un maestro del TebakBom! 🎉*
+            await m.reply(`*¡Eres un maestro del TebakBom! 🎉*
 
 ${brd}
 
 *Casillas abiertas:* ${casillasAbiertas}
 Vida restante: ${vidasRestantes}
 Bombas restantes: ${bombasRestantes}
-🎖 *Has ganado ${expGanado} EXP*`);
+🎖 *Has ganado ${dineroGanado} Dinero*`);
 
-                delete tebakbom[m.sender]; // Eliminar la partida después de ganar
-            } else {
-                await m.reply(`*SELECCIONA UN NÚMERO*
+            delete tebakbom[m.sender]; // Eliminar la partida después de ganar
+        } else {
+            await m.reply(`*SELECCIONA UN NÚMERO*
 
 ${brd}
 
 *Casillas abiertas:* ${casillasAbiertas}
 Vida restante: ${vidasRestantes}
 Bombas restantes: ${bombasRestantes}`);
-            }
         }
     }
+}
 
     // 🔥 Solución a dependencias circulares en game y confirm
     db.game = db.game || {}; // Asegura que db.game siempre exista
@@ -1684,13 +1680,13 @@ case 'ruletas':
 case 'suerte':
 case 'casino':
     if (!global.db.data.users[m.sender]) {
-        global.db.data.users[m.sender] = { exp: 0, uang: 0 }; // Inicializa EXP y Dinero si no existen
+        global.db.data.users[m.sender] = { exp: 0, money: 0 }; // Inicializa EXP y Dinero si no existen
     }
 
     let apuesta = parseInt(args[0]);
     if (isNaN(apuesta) || apuesta <= 0) return m.reply('❌ Ingresa una cantidad válida de dinero para apostar.');
 
-    let userMoney = global.db.data.users[m.sender].uang;
+    let userMoney = global.db.data.users[m.sender].money;
     if (apuesta > userMoney) return m.reply('❌ No tienes suficiente dinero para apostar.');
 
     // Generar puntos para el jugador y la computadora
@@ -1698,7 +1694,7 @@ case 'casino':
     let puntosComputadora = Math.floor(Math.random() * 101);
 
     // Apostar restando el dinero del jugador
-    global.db.data.users[m.sender].uang -= apuesta;
+    global.db.data.users[m.sender].money -= apuesta;
 
     // Evaluar el resultado del casino
     if (puntosJugador > puntosComputadora) {
@@ -1707,7 +1703,7 @@ case 'casino':
     } else if (puntosJugador < puntosComputadora) {
         m.reply(`💰 Casino 💰\n*Tú:* ${puntosJugador} Punto\n*Computadora:* ${puntosComputadora} Punto\n\n*Tu PIERDES*\nPerdiste ${apuesta} Dinero`);
     } else {
-        global.db.data.users[m.sender].uang += apuesta; // Devuelve el dinero en empate
+        global.db.data.users[m.sender].money += apuesta; // Devuelve el dinero en empate
         m.reply(`💰 Casino 💰\n*Tú:* ${puntosJugador} Punto\n*Computadora:* ${puntosComputadora} Punto\n\n*Empate*\nRecuperas tu apuesta de ${apuesta} Dinero`);
     }
     break;
@@ -3037,7 +3033,7 @@ const profileText = `
 🌟 *Nivel:* ${user.level}
 💎 *Exp:* ${user.exp}
 🛡️ *Rol:* ${user.role}
-💰 *EXP:* ${user.money}
+💰 *Dinero:* ${user.money}
 🏦 *Banco:* ${user.banco}
 💎 *Diamantes:* ${user.diamonds}
 🕰️ *Registrado desde:* ${new Date(user.regTime).toLocaleString()}
