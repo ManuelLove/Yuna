@@ -44,25 +44,31 @@ const gameCasinoSolo = async (conn, m, prefix, db) => {
     try {
         let buatall = 1;
         const botNumber = await conn.decodeJid(conn.user.id);
-        
+
+        // Verificar si el usuario ingresó una cantidad válida
         if (!m.args[0]) return m.reply(`❌ Ingresa la cantidad de EXP a apostar.\nEjemplo: ${prefix + m.command} 1000`);
-        
         let count = parseInt(m.args[0]);
         if (isNaN(count) || count <= 0) return m.reply(`❌ Cantidad no válida.\nEjemplo: ${prefix + m.command} 1000`);
 
+        // Verificar si el usuario y el bot tienen un perfil en la base de datos
         if (!db.users[m.sender]) db.users[m.sender] = { exp: 0 };
         if (!db.set[botNumber]) db.set[botNumber] = { exp: 0 };
 
+        // Verificar si el usuario tiene suficiente EXP
         if (db.users[m.sender].exp < count) return m.reply(`❌ No tienes suficiente EXP para apostar.`);
         
-        let randomaku = Math.floor(Math.random() * 101);
-        let randomkamu = Math.floor(Math.random() * 81);
-        let Aku = randomaku;
-        let Kamu = randomkamu;
+        // Generar números aleatorios para el juego
+        let Aku = Math.floor(Math.random() * 101);
+        let Kamu = Math.floor(Math.random() * 81);
 
+        // Apostar restando la EXP del usuario
         db.users[m.sender].exp -= count;
         db.set[botNumber].exp += count;
 
+        // DEBUG: Mostrar en consola los valores de juego
+        console.log(`DEBUG Casino:`, { Aku, Kamu, count, userExp: db.users[m.sender].exp });
+
+        // Evaluar el resultado del juego
         if (Aku > Kamu) {
             m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu PIERDES*\nPerdiste ${count} EXP`);
         } else if (Aku < Kamu) {
@@ -75,8 +81,8 @@ const gameCasinoSolo = async (conn, m, prefix, db) => {
         }
 
     } catch (e) {
-        console.log("DEBUG Casino Error: ", e);
-        m.reply('❌ Error en el casino.');
+        console.error("❌ ERROR en el casino:", e); // Muestra el error exacto en la consola
+        m.reply('❌ Error en el casino. Revisa la consola para más detalles.');
     }
 };
 
