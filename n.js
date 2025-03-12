@@ -347,9 +347,9 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 			}
 			let jwb = m.sender == roof.p
 			let jwb2 = m.sender == roof.p2
-			let t = /tijeras/i
-			let d = /piedra/i
-			let p = /papel/i
+			let g = /tijeras/i
+			let b = /piedra/i
+			let k = /papel/i
 			let reg = /^(tijeras|piedra|papel)/i;
 			
 			if (jwb && reg.test(m.text) && !roof.pilih && !m.isGroup) {
