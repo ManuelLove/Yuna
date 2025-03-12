@@ -943,7 +943,7 @@ users[winner].exp += winScore - playScore
 }
 }
 // 🎮 Suit PvP - Verifica registro y muestra resultados correctamente
-    let roof = Object.values(suitpvp).find(roof => roof.id && roof.status && [roof.p, roof.p2].includes(m.sender));
+let roof = Object.values(suitpvp).find(roof => roof.id && roof.status && [roof.p, roof.p2].includes(m.sender));
     if (roof) {
         let win = '';
         let tie = false;
@@ -1037,7 +1037,6 @@ users[winner].exp += winScore - playScore
         }
     }
 }
-break;
 		
 // Tebak Bomb (Ahora usa Dinero en lugar de EXP)
 let pilih = '🌀', bomb = '💣';
