@@ -940,7 +940,102 @@ if (isWin)
 users[winner].exp += winScore - playScore
 }
 }
-
+		// Suit PvP
+		let roof = Object.values(suit).find(roof => roof.id && roof.status && [roof.p, roof.p2].includes(m.sender))
+		if (roof) {
+			let win = ''
+			let tie = false
+			if (m.sender == roof.p2 && /^(acc(ept)?|aceptar|gas|oke?|rechazar|gamau|nanti|ga(k.)?bisa|y)/i.test(m.text) && m.isGroup && roof.status == 'wait') {
+				if (/^(rechazar|gamau|nanti|n|ga(k.)?bisa)/i.test(m.text)) {
+					m.reply(`@${roof.p2.split`@`[0]} rechazar suit,\nsuit cancelado`)
+					delete suit[roof.id]
+					return !0
+				}
+				roof.status = 'play';
+				roof.asal = m.chat;
+				clearTimeout(roof.waktu);
+				m.reply(`Suit ha sido enviado al chat\n\n@${roof.p.split`@`[0]} Y @${roof.p2.split`@`[0]}\n\nPor favor seleccione un suit en el chat en cada clic https://wa.me/${botNumber.split`@`[0]}`)
+				if (!roof.pilih) naze.sendMessage(roof.p, { text: `Por favor seleccione \n\nPiedra🗿\nPapel📄\nTijeras✂️` }, { quoted: m })
+				if (!roof.pilih2) naze.sendMessage(roof.p2, { text: `Por favor seleccione \n\nPiedra🗿\nPapel📄\nTijeras✂️` }, { quoted: m })
+				roof.waktu_milih = setTimeout(() => {
+					if (!roof.pilih && !roof.pilih2) m.reply(`Ambos jugadores no tienen intención de jugar,\nSuit cancelado`)
+					else if (!roof.pilih || !roof.pilih2) {
+						win = !roof.pilih ? roof.p2 : roof.p
+						m.reply(`@${(roof.pilih ? roof.p2 : roof.p).split`@`[0]} no elijas un suit, el juego termina`)
+					}
+					delete suit[roof.id]
+					return !0
+				}, roof.timeout)
+			}
+			let jwb = m.sender == roof.p
+			let jwb2 = m.sender == roof.p2
+			let g = /tijeras/i
+			let b = /piedra/i
+			let k = /papel/i
+			let reg = /^(tijeras|piedra|papel)/i;
+			
+			if (jwb && reg.test(m.text) && !roof.pilih && !m.isGroup) {
+				roof.pilih = reg.exec(m.text.toLowerCase())[0];
+				roof.text = m.text;
+				m.reply(`tu has elegido ${m.text} ${!roof.pilih2 ? `\n\nEsperando que el oponente elija` : ''}`);
+				if (!roof.pilih2) naze.sendMessage(roof.p2, { text: '_El oponente ya ha elegido_\nAhora es tu turno' })
+			}
+			if (jwb2 && reg.test(m.text) && !roof.pilih2 && !m.isGroup) {
+				roof.pilih2 = reg.exec(m.text.toLowerCase())[0]
+				roof.text2 = m.text
+				m.reply(`tu has elegido ${m.text} ${!roof.pilih ? `\n\nEsperando que el oponente elija` : ''}`)
+				if (!roof.pilih) naze.sendMessage(roof.p, { text: '_El oponente ya ha elegido_\nAhora es tu turno' })
+			}
+			let stage = roof.pilih
+			let stage2 = roof.pilih2
+			if (roof.pilih && roof.pilih2) {
+				clearTimeout(roof.waktu_milih)
+				if (b.test(stage) && g.test(stage2)) win = roof.p
+				else if (b.test(stage) && k.test(stage2)) win = roof.p2
+				else if (g.test(stage) && k.test(stage2)) win = roof.p
+				else if (g.test(stage) && b.test(stage2)) win = roof.p2
+				else if (k.test(stage) && b.test(stage2)) win = roof.p
+				else if (k.test(stage) && g.test(stage2)) win = roof.p2
+				else if (stage == stage2) tie = true
+				db.users[roof.p == win ? roof.p : roof.p2].limit += tie ? 0 : 3
+				db.users[roof.p == win ? roof.p : roof.p2].uang += tie ? 0 : 3000
+				naze.sendMessage(roof.asal, { text: `_*Resultados Suit*_${tie ? '\nEmpate' : ''}\n\n@${roof.p.split`@`[0]} (${roof.text}) ${tie ? '' : roof.p == win ? ` Ganar \n` : ` Perdido \n`}\n@${roof.p2.split`@`[0]} (${roof.text2}) ${tie ? '' : roof.p2 == win ? ` Ganar \n` : ` Perdido \n`}\n\nEl ganador obtiene\n*Premio :* Dinero(3000) y límite(3)`.trim(), mentions: [roof.p, roof.p2] }, { quoted: m })
+				delete suit[roof.id]
+			}
+		}
+		
+		// Tebak Bomb
+		let pilih = '🌀', bomb = '💣';
+		if (m.sender in tebakbom) {
+			if (!/^[1-9]|10$/i.test(body) && !isCmd && !isCreator) return !0;
+			if (tebakbom[m.sender].petak[parseInt(body) - 1] === 1) return !0;
+			if (tebakbom[m.sender].petak[parseInt(body) - 1] === 2) {
+				tebakbom[m.sender].board[parseInt(body) - 1] = bomb;
+				tebakbom[m.sender].pick++;
+				naze.sendMessage(m.chat, { react: {text: '❌', key: m.key }})
+				tebakbom[m.sender].bomb--;
+				tebakbom[m.sender].nyawa.pop();
+				let brd = tebakbom[m.sender].board;
+				if (tebakbom[m.sender].nyawa.length < 1) {
+					await m.reply(`*EL JUEGO HA TERMINADO*\nFuiste alcanzado por una bomba\n\n ${brd.join('')}\n\n*Seleccionado :* ${tebakbom[m.sender].pick}\n_Reducción de límite : 1_`);
+					naze.sendMessage(m.chat, { react: { text: '😂', key: m.key }})
+					delete tebakbom[m.sender];
+				} else await m.reply(`*SELECCIONA UN NÚMERO*\n\nFuiste alcanzado por una bomba\n ${brd.join('')}\n\nSeleccionado: ${tebakbom[m.sender].pick}\nVida restante: ${tebakbom[m.sender].nyawa}`);
+				return !0;
+			}
+			if (tebakbom[m.sender].petak[parseInt(body) - 1] === 0) {
+				tebakbom[m.sender].petak[parseInt(body) - 1] = 1;
+				tebakbom[m.sender].board[parseInt(body) - 1] = pilih;
+				tebakbom[m.sender].pick++;
+				tebakbom[m.sender].lolos--;
+				let brd = tebakbom[m.sender].board;
+				if (tebakbom[m.sender].lolos < 1) {
+					db.users[m.sender].uang += 6000
+					await m.reply(`*ERES GRANDE ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Seleccionado :* ${tebakbom[m.sender].pick}\n*Vida restante :* ${tebakbom[m.sender].nyawa}\n*Bomba :* ${tebakbom[m.sender].bomb}\nBonificaciones Dinero 💰 *+6000*`);
+					delete tebakbom[m.sender];
+				} else m.reply(`*SELECCIONA UN NÚMERO*\n\n${brd.join('')}\n\nSeleccionado : ${tebakbom[m.sender].pick}\nVida restante : ${tebakbom[m.sender].nyawa}\nBomba : ${tebakbom[m.sender].bomb}`)
+			}
+		}
 //math
 if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
 kuis = true
