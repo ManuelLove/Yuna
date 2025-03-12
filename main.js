@@ -158,7 +158,9 @@ const {
 enable
 } = require('./plugins/enable.js')
 //global.db.data.sticker = global.db.data.sticker || {} 
-let suit = db.game.suit = []
+db.game = db.game || {}; // Asegura que db.game exista
+db.game.suit = db.game.suit || []; // Asegura que suit exista
+let suit = db.game.suit;
 let tebakbom = db.game.tebakbom = []
 let user = global.db.data.users[m.sender]
 let tebaklagu = global.db.data.game.tebaklagu = []
