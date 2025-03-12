@@ -323,8 +323,8 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 		if (roof) {
 			let win = ''
 			let tie = false
-			if (m.sender == roof.p2 && /^(acc(ept)?|terima|gas|oke?|tolak|gamau|nanti|ga(k.)?bisa|y)/i.test(m.text) && m.isGroup && roof.status == 'wait') {
-				if (/^(tolak|gamau|nanti|n|ga(k.)?bisa)/i.test(m.text)) {
+			if (m.sender == roof.p2 && /^(acc(ept)?|aceptar|gas|oke?|rechazar|gamau|nanti|ga(k.)?bisa|y)/i.test(m.text) && m.isGroup && roof.status == 'wait') {
+				if (/^(rechazar|gamau|nanti|n|ga(k.)?bisa)/i.test(m.text)) {
 					m.reply(`@${roof.p2.split`@`[0]} rechazar suit,\nsuit cancelado`)
 					delete suit[roof.id]
 					return !0
@@ -347,10 +347,10 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 			}
 			let jwb = m.sender == roof.p
 			let jwb2 = m.sender == roof.p2
-			let g = /gunting/i
-			let b = /batu/i
-			let k = /kertas/i
-			let reg = /^(gunting|batu|kertas)/i;
+			let t = /tijeras/i
+			let d = /piedra/i
+			let p = /papel/i
+			let reg = /^(tijeras|piedra|papel)/i;
 			
 			if (jwb && reg.test(m.text) && !roof.pilih && !m.isGroup) {
 				roof.pilih = reg.exec(m.text.toLowerCase())[0];
@@ -1165,8 +1165,8 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 			}
 			break
 			case 'req': case 'request': {
-				if (!text) return m.reply('Mau Request apa ke Owner?')
-				await m.reply(`*Request Telah Terkirim Ke Owner*\n_Terima Kasih🙏_`)
+				if (!text) return m.reply('¿Qué quieres pedirle al propietario?')
+				await m.reply(`*La solicitud ha sido enviada al propietario*\n_Gracias🙏_`)
 				await naze.sendFromOwner(owner, `Mensaje de : @${m.sender.split('@')[0]}\nUntuk Owner\n\nRequest ${text}`, m, { contextInfo: { mentionedJid: [m.sender], isForwarded: true }})
 			}
 			break
@@ -2567,7 +2567,7 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 				if (!m.mentionedJid[0]) return m.reply(`_Siapa yang ingin kamu tantang?_\nTag orangnya..\n\nContoh : ${prefix}suit @${owner[0]}`, m.chat, { mentions: [owner[1] + '@s.whatsapp.net'] })
 				if (Object.values(suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.mentionedJid[0]))) return m.reply(`Orang yang kamu tantang sedang bermain suit bersama orang lain :(`)
 				let id = 'suit_' + new Date() * 1
-				let caption = `_*SUIT PvP*_\n\n@${m.sender.split`@`[0]} menantang @${m.mentionedJid[0].split`@`[0]} untuk bermain suit\n\nSilahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
+				let caption = `_*SUIT PvP*_\n\n@${m.sender.split`@`[0]} desafío @${m.mentionedJid[0].split`@`[0]} jugar al Suit\n\nPor favor @${m.mentionedJid[0].split`@`[0]} escribir aceptar/rechazar`
 				suit[id] = {
 					chat: m.reply(caption),
 					id: id,
