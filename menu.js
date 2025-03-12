@@ -155,8 +155,8 @@ let juegos = `꧁✦  *👾 ＭＥＮＵ ＪＵＥＧＯＳ 👾*  ✦꧂
 ┃ ➫ ❏ ${prefix}simi _(hablar)_  
 ┃ ➫ ❏ ${prefix}ppt _(piedra, papel)_ 
 ┃ ➫ ❏ ${prefix}suitpvp _(1 vs 1)_
-┃ ➫ ❏ ${prefix}casino _(apuesta exp)_
-┃ ➫ ❏ ${prefix}tebakbom _(bomba)_ 
+┃ ➫ ❏ ${prefix}casino _(apuestas)_
+┃ ➫ ❏ ${prefix}boom _(AdivBom)_ 
 ┃ ➫ ❏ ${prefix}gay @tag  
 ┃ ➫ ❏ ${prefix}pareja @tag  
 ┃ ➫ ❏ ${prefix}love @tag  
@@ -618,8 +618,8 @@ let menu = `╔━━━▣━━◤ 𝘼𝙉𝙎𝙄◢━━▣━━━╗
 ┃ ➫ ❏ ${prefix}sɪᴍɪ _(ʜᴀʙʟᴀʀ ᴄᴏɴ ᴇʟ ʙᴏᴛ)_
 ┃ ➫ ❏ ${prefix}ᴘᴘᴛ _(ᴘɪᴇᴅʀᴀ, ᴘᴀᴘᴇʟ, ᴏ ᴛɪᴊᴇʀᴀ)_
 ┃ ➫ ❏ ${prefix}suitpvp _(1 vs 1)_
-┃ ➫ ❏ ${prefix}casino _(apuesta exp)_
-┃ ➫ ❏ ${prefix}tebakbom _(bomba)_
+┃ ➫ ❏ ${prefix}casino _(apuestas)_
+┃ ➫ ❏ ${prefix}boom _(AdivBom)_
 ┃ ➫ ❏ ${prefix}ɢᴀʏ @ᴛᴀɢ
 ┃ ➫ ❏ ${prefix}ᴘᴀʀᴇᴊᴀ @ᴛᴀɢ
 ┃ ➫ ❏ ${prefix}ʟᴏᴠᴇ @ᴛᴀɢ
