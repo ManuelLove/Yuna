@@ -1017,20 +1017,34 @@ if (roof) {
         }
 
         // **Mostrar resultados en el grupo**
-        let resultadoMsg = `🎮 *Resultados de Suit PvP*\n\n`;
-        resultadoMsg += `👤 @${roof.p.split`@`[0]} eligió: *${roof.pilih}*\n`;
-        resultadoMsg += `👤 @${roof.p2.split`@`[0]} eligió: *${roof.pilih2}*\n\n`;
+if (roof.p && roof.p2) { // 🔥 Verifica que ambos jugadores existan
+    let resultadoMsg = `🎮 *Resultados de Suit PvP*\n\n`;
+    resultadoMsg += `👤 @${roof.p.split`@`[0]} eligió: *${roof.pilih || '❓'}*\n`;
+    resultadoMsg += `👤 @${roof.p2.split`@`[0]} eligió: *${roof.pilih2 || '❓'}*\n\n`;
+    
+    if (tie) {
+        resultadoMsg += `⚖️ *Empate* - Nadie gana ni pierde.`;
+    } else {
+        let winner = win === roof.p ? roof.p : roof.p2;
+        let loser = win === roof.p ? roof.p2 : roof.p;
         
-        if (tie) {
-            resultadoMsg += `⚖️ *Empate* - Nadie gana ni pierde.`;
-        } else {
-            resultadoMsg += `🏆 *Ganador:* @${win.split`@`[0]}\n💰 *Premio:* ${premioDinero} Dinero, ${expGanador} EXP\n❌ *Perdedor pierde:* ${expPerdedor} EXP`;
-        }
-
-        conn.sendMessage(roof.asal, { text: resultadoMsg.trim(), mentions: [roof.p, roof.p2] }, { quoted: m });
-        
-        delete suitpvp[roof.id];
+        resultadoMsg += `🏆 *Ganador:* @${winner.split`@`[0]}\n`;
+        resultadoMsg += `❌ *Perdedor:* @${loser.split`@`[0]}`;
     }
+
+    // 🔥 Evita enviar el mensaje si hay valores indefinidos
+    try {
+        await conn.sendMessage(roof.asal, { 
+            text: resultadoMsg.trim(), 
+            mentions: [roof.p, roof.p2].filter(jid => jid) // 🔥 Filtra valores vacíos
+        }, { quoted: m });
+    } catch (err) {
+        console.error("Error al enviar el mensaje de resultado:", err);
+    }
+
+    delete suitpvp[roof.id]; // 🔥 Elimina la partida
+} else {
+    console.error("Error: uno de los jugadores está indefinido", { roof });
 }
 		
 // Tebak Bomb (Ahora usa Dinero en lugar de EXP)
