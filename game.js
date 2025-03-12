@@ -41,56 +41,38 @@ const gameSlot = async (conn, m, db) => {
 }
 
 const gameCasinoSolo = async (conn, m, prefix, db) => {
-    try {
-        let buatall = 1;
-        const botNumber = await conn.decodeJid(conn.user.id);
-
-        // Extraer la cantidad de apuesta desde el mensaje
-        let args = m.text.split(" "); // Dividir el mensaje en palabras
-        let count = parseInt(args[1]); // Obtener el segundo elemento como número
-
-        // Verificar si el usuario ingresó una cantidad válida
-        if (!count || isNaN(count) || count <= 0) 
-            return m.reply(`❌ Ingresa la cantidad de EXP a apostar.\nEjemplo: ${prefix + m.command} 1000`);
-
-        // Verificar si el usuario y el bot tienen un perfil en la base de datos
-        if (!db.users[m.sender]) db.users[m.sender] = { exp: 0 };
-        if (!db.set[botNumber]) db.set[botNumber] = { exp: 0 };
-
-        // Verificar si el usuario tiene suficiente EXP
-        if (db.users[m.sender].exp < count) 
-            return m.reply(`❌ No tienes suficiente EXP para apostar.`);
-        
-        // Generar números aleatorios para el juego
-        let Aku = Math.floor(Math.random() * 101);
-        let Kamu = Math.floor(Math.random() * 81);
-
-        // Apostar restando la EXP del usuario
-        db.users[m.sender].exp -= count;
-        db.set[botNumber].exp += count;
-
-        // DEBUG: Mostrar valores de juego en el chat
-        let debugInfo = `🔍 *DEBUG Casino*\n- Tú: ${Kamu} Puntos\n- Computadora: ${Aku} Puntos\n- Apuesta: ${count} EXP\n- EXP actual: ${db.users[m.sender].exp}`;
-        await m.reply(debugInfo);
-
-        // Evaluar el resultado del juego
-        if (Aku > Kamu) {
-            m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu PIERDES*\nPerdiste ${count} EXP`);
-        } else if (Aku < Kamu) {
-            let expGanado = count * 2;
-            db.users[m.sender].exp += expGanado;
-            m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu Ganas*\nObtienes ${expGanado} EXP`);
-        } else {
-            db.users[m.sender].exp += count;
-            m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Empate*\nRecuperas tu apuesta de ${count} EXP`);
-        }
-
-    } catch (e) {
-        let errorMessage = `❌ ERROR en el casino:\n${e.message}`;
-        console.error(errorMessage);
-        await m.reply(errorMessage);
-    }
-};
+	try {
+		let buatall = 1
+		const botNumber = await conn.decodeJid(conn.user.id)
+		let randomaku = `${Math.floor(Math.random() * 101)}`.trim()
+		let randomkamu = `${Math.floor(Math.random() * 81)}`.trim() //hehe Biar Susah Menang :v
+		let Aku = (randomaku * 1)
+		let Kamu = (randomkamu * 1)
+		let count = m.args[0]
+		count = count ? 'all' === count ? Math.floor(db.users[m.sender].exp / buatall) : parseInt(count) : m.args[0] ? parseInt(m.args[0]) : 1
+		count = Math.max(1, count)
+		if (m.args.length < 1) return m.reply(prefix + 'casino <jumlah>\n' + prefix + 'casino 1000')
+		if (isNaN(m.args[0])) return m.reply(`¡Ingrese el monto!\nEjemplo : ${prefix + m.command} 1000`)
+		if (db.users[m.sender].exp >= count * 1) {
+			db.users[m.sender].exp -= count * 1
+			db.set[botNumber].uang += count * 1
+			if (Aku > Kamu) {
+				m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu PIERDES*\nPerdiste EXP ${count} Dinero`.trim())
+			} else if (Aku < Kamu) {
+				db.users[m.sender].exp += count * 2
+				m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu Ganas*\nObtienes ${count * 2} Dinero`.trim())
+			} else {
+				db.users[m.sender].exp += count * 1
+				m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*EMPATE*\nObtienes ${count * 1} Dinero`.trim())
+			}
+		} else {
+			m.reply(`¡Su dinero no es suficiente para el Casino, por favor *recoja* primero!`)
+		}
+	} catch (e) {
+		console.log(e)
+		m.reply('Error!')
+	}
+}
 
 const gameMerampok = async (m, db) => {
 	let __timers = (new Date - db.users[m.sender].lastrampok)

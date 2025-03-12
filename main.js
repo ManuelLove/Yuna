@@ -1683,8 +1683,43 @@ case 'ruleta':
 case 'ruletas':
 case 'suerte':
 case 'casino':
-    gameCasinoSolo(conn, m, prefix, db); // Ahora usa la función de game.js
-    break;
+    const gameCasinoSolo = async (conn, m, prefix, db) => {
+    try {
+        let buatall = 1;
+        const botNumber = await conn.decodeJid(conn.user.id);
+        let randomaku = `${Math.floor(Math.random() * 101)}`.trim();
+        let randomkamu = `${Math.floor(Math.random() * 81)}`.trim();
+        let Aku = (randomaku * 1);
+        let Kamu = (randomkamu * 1);
+        let count = m.args[0];
+
+        count = count ? 'all' === count ? Math.floor(db.users[m.sender].exp / buatall) : parseInt(count) : m.args[0] ? parseInt(m.args[0]) : 1;
+        count = Math.max(1, count);
+
+        if (m.args.length < 1) return m.reply(prefix + 'casino <cantidad>\nEjemplo: ' + prefix + 'casino 1000');
+        if (isNaN(m.args[0])) return m.reply(`¡Ingrese la cantidad de EXP a apostar!\nEjemplo: ${prefix + m.command} 1000`);
+        
+        if (db.users[m.sender].exp >= count * 1) {
+            db.users[m.sender].exp -= count * 1;
+            db.set[botNumber].exp += count * 1;
+
+            if (Aku > Kamu) {
+                m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu PIERDES*\nPerdiste ${count} EXP`.trim());
+            } else if (Aku < Kamu) {
+                db.users[m.sender].exp += count * 2;
+                m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu Ganas*\nObtienes ${count * 2} EXP`.trim());
+            } else {
+                db.users[m.sender].exp += count * 1;
+                m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Empate*\nObtienes ${count} EXP`.trim());
+            }
+        } else {
+            m.reply(`❌ No tienes suficiente EXP para apostar.`);
+        }
+    } catch (e) {
+        console.log(e);
+        m.reply('❌ Error en el casino.');
+    }
+};
     break
 case 'verdad':
 case 'reto':
