@@ -2319,7 +2319,7 @@ description: "kontol woi",
 priceAmount1000: 99999999 * 1000,
 currencyCode: "NIO",
 retailerId: "100000",
-url: `https://whatsapp.com/channel/0029VadxAUkKLaHjPfS1vP36`,            
+url: `https://`,            
 },
 businessOwnerJid: m.sender,
 caption: "halloww", 
@@ -5499,7 +5499,7 @@ conn.copyNForward(m.chat, msgs[budy.toLowerCase()], true)
 
 //--------------------[ REPORTE/ERRORS ]-----------------------     
 let e = String(err)
-conn.sendMessage("50582382653@s.whatsapp.net", {
+conn.sendMessage("573012686632@s.whatsapp.net", {
 text: "Hola Creador/desarrollador, parece haber un error, por favor arreglarlo 🥲\n\n" + util.format(e),
 contextInfo: {
 forwardingScore: 9999999,
