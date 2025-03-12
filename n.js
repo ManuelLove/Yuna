@@ -2562,10 +2562,10 @@ module.exports = naze = async (naze, m, chatUpdate, store, groupCache) => {
 				let poin = 10
 				let poin_lose = 10
 				let timeout = 60000
-				if (Object.values(suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.sender))) m.reply(`Selesaikan suit mu yang sebelumnya`)
+				if (Object.values(suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.sender))) m.reply(`Termina tu traje anterior`)
 				if (m.mentionedJid[0] === m.sender) return m.reply(`Tidak bisa bermain dengan diri sendiri !`)
-				if (!m.mentionedJid[0]) return m.reply(`_Siapa yang ingin kamu tantang?_\nTag orangnya..\n\nContoh : ${prefix}suit @${owner[0]}`, m.chat, { mentions: [owner[1] + '@s.whatsapp.net'] })
-				if (Object.values(suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.mentionedJid[0]))) return m.reply(`Orang yang kamu tantang sedang bermain suit bersama orang lain :(`)
+				if (!m.mentionedJid[0]) return m.reply(`_¿A quién quieres desafiar?_\nEtiqueta a la persona..\n\nEjemplo : ${prefix}suit @${owner[0]}`, m.chat, { mentions: [owner[1] + '@s.whatsapp.net'] })
+				if (Object.values(suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.mentionedJid[0]))) return m.reply(`La persona a la que estás desafiando está jugando con otra persona :(`)
 				let id = 'suit_' + new Date() * 1
 				let caption = `_*SUIT PvP*_\n\n@${m.sender.split`@`[0]} desafío @${m.mentionedJid[0].split`@`[0]} jugar al Suit\n\nPor favor @${m.mentionedJid[0].split`@`[0]} escribir aceptar/rechazar`
 				suit[id] = {
