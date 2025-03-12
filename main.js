@@ -957,8 +957,12 @@ if (roof) {
         roof.asal = m.chat;
         clearTimeout(roof.waktu);
         m.reply(`Suit ha sido enviado al chat\n\n@${roof.p.split`@`[0]} y @${roof.p2.split`@`[0]}\n\nPor favor seleccionen su jugada.`)
-        if (!roof.pilih) naze.sendMessage(roof.p, { text: `Selecciona una opción:\n\n🗿 Piedra\n📄 Papel\n✂️ Tijeras` }, { quoted: m })
-        if (!roof.pilih2) naze.sendMessage(roof.p2, { text: `Selecciona una opción:\n\n🗿 Piedra\n📄 Papel\n✂️ Tijeras` }, { quoted: m })
+        if (!roof.pilih) {
+    await conn.sendMessage(roof.p, { text: `🗿 Piedra\n📄 Papel\n✂️ Tijeras\n\nEscribe una de las opciones para jugar.` }, { quoted: m });
+}
+if (!roof.pilih2) {
+    await conn.sendMessage(roof.p2, { text: `🗿 Piedra\n📄 Papel\n✂️ Tijeras\n\nEscribe una de las opciones para jugar.` }, { quoted: m });
+}
         roof.waktu_milih = setTimeout(() => {
             if (!roof.pilih && !roof.pilih2) m.reply(`Ninguno de los jugadores eligió,\nSuit PvP cancelado`)
             else if (!roof.pilih || !roof.pilih2) {
@@ -1817,7 +1821,7 @@ case 'boom': {
                 m.reply(`_⏳ Tiempo de ${command} agotado_`)
                 delete boom[m.sender]; // 🔥 Asegurar que la partida se borre si expira el tiempo
             }
-        }, 120000)
+        }, 160000)
     }
     
     m.reply(`*💣 BOOM - ADIVINA LA BOMBA 💣*\n\n${boom[m.sender].board.join("")}\n\n¡Elige un número! ¡Y no te dejes alcanzar por una bomba!\n\n🔸 Bombas: ${boom[m.sender].bomb}\n❤️ Vidas: ${boom[m.sender].nyawa.join("")}`);
