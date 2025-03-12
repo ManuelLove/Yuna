@@ -44,36 +44,38 @@ const gameCasinoSolo = async (conn, m, prefix, db) => {
     try {
         let buatall = 1;
         const botNumber = await conn.decodeJid(conn.user.id);
-        let randomaku = `${Math.floor(Math.random() * 101)}`.trim();
-        let randomkamu = `${Math.floor(Math.random() * 81)}`.trim();
-        let Aku = (randomaku * 1);
-        let Kamu = (randomkamu * 1);
-        let count = m.args[0];
-
-        count = count ? 'all' === count ? Math.floor(db.users[m.sender].exp / buatall) : parseInt(count) : m.args[0] ? parseInt(m.args[0]) : 1;
-        count = Math.max(1, count);
-
-        if (m.args.length < 1) return m.reply(prefix + 'casino <cantidad>\nEjemplo: ' + prefix + 'casino 1000');
-        if (isNaN(m.args[0])) return m.reply(`¡Ingrese la cantidad de EXP a apostar!\nEjemplo: ${prefix + m.command} 1000`);
         
-        if (db.users[m.sender].exp >= count * 1) {
-            db.users[m.sender].exp -= count * 1;
-            db.set[botNumber].exp += count * 1;
+        if (!m.args[0]) return m.reply(`❌ Ingresa la cantidad de EXP a apostar.\nEjemplo: ${prefix + m.command} 1000`);
+        
+        let count = parseInt(m.args[0]);
+        if (isNaN(count) || count <= 0) return m.reply(`❌ Cantidad no válida.\nEjemplo: ${prefix + m.command} 1000`);
 
-            if (Aku > Kamu) {
-                m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu PIERDES*\nPerdiste ${count} EXP`.trim());
-            } else if (Aku < Kamu) {
-                db.users[m.sender].exp += count * 2;
-                m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu Ganas*\nObtienes ${count * 2} EXP`.trim());
-            } else {
-                db.users[m.sender].exp += count * 1;
-                m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Empate*\nObtienes ${count} EXP`.trim());
-            }
+        if (!db.users[m.sender]) db.users[m.sender] = { exp: 0 };
+        if (!db.set[botNumber]) db.set[botNumber] = { exp: 0 };
+
+        if (db.users[m.sender].exp < count) return m.reply(`❌ No tienes suficiente EXP para apostar.`);
+        
+        let randomaku = Math.floor(Math.random() * 101);
+        let randomkamu = Math.floor(Math.random() * 81);
+        let Aku = randomaku;
+        let Kamu = randomkamu;
+
+        db.users[m.sender].exp -= count;
+        db.set[botNumber].exp += count;
+
+        if (Aku > Kamu) {
+            m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu PIERDES*\nPerdiste ${count} EXP`);
+        } else if (Aku < Kamu) {
+            let expGanado = count * 2;
+            db.users[m.sender].exp += expGanado;
+            m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu Ganas*\nObtienes ${expGanado} EXP`);
         } else {
-            m.reply(`❌ No tienes suficiente EXP para apostar.`);
+            db.users[m.sender].exp += count;
+            m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Empate*\nRecuperas tu apuesta de ${count} EXP`);
         }
+
     } catch (e) {
-        console.log(e);
+        console.log("DEBUG Casino Error: ", e);
         m.reply('❌ Error en el casino.');
     }
 };
