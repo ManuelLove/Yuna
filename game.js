@@ -65,8 +65,9 @@ const gameCasinoSolo = async (conn, m, prefix, db) => {
         db.users[m.sender].exp -= count;
         db.set[botNumber].exp += count;
 
-        // DEBUG: Mostrar en consola los valores de juego
-        console.log(`DEBUG Casino:`, { Aku, Kamu, count, userExp: db.users[m.sender].exp });
+        // DEBUG: Mostrar valores de juego en el chat
+        let debugInfo = `🔍 *DEBUG Casino*\n- Tú: ${Kamu} Puntos\n- Computadora: ${Aku} Puntos\n- Apuesta: ${count} EXP\n- EXP actual: ${db.users[m.sender].exp}`;
+        await m.reply(debugInfo);
 
         // Evaluar el resultado del juego
         if (Aku > Kamu) {
@@ -81,8 +82,9 @@ const gameCasinoSolo = async (conn, m, prefix, db) => {
         }
 
     } catch (e) {
-        console.error("❌ ERROR en el casino:", e); // Muestra el error exacto en la consola
-        m.reply('❌ Error en el casino. Revisa la consola para más detalles.');
+        let errorMessage = `❌ ERROR en el casino:\n${e.message}`;
+        console.error(errorMessage);
+        await m.reply(errorMessage);
     }
 };
 
