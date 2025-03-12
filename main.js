@@ -125,6 +125,7 @@ game,
 game2,
 game3
 } = require('./plugins/juegos.js')
+const { rdGame, iGame, tGame, gameSlot, gameCasinoSolo, gameMerampok, gameBegal, daily, buy, setLimit, addLimit, addUang, setUang, transfer } = require('./libs/game.js')
 const {
 buscadores
 } = require('./plugins/buscadores.js')
@@ -157,6 +158,8 @@ const {
 enable
 } = require('./plugins/enable.js')
 //global.db.data.sticker = global.db.data.sticker || {} 
+let suit = db.game.suit = []
+let tebakbom = db.game.tebakbom = []
 let user = global.db.data.users[m.sender]
 let tebaklagu = global.db.data.game.tebaklagu = []
 let kuismath = global.db.data.game.math = []
@@ -1562,7 +1565,66 @@ delete kuismath[m.sender.split('@')[0]]
 }
 }
 break
-
+			case 'casino': {
+				await gameCasinoSolo(naze, m, prefix, db)
+			}
+			break
+			case 'suitpvp': case 'suit': {
+				let poin = 10
+				let poin_lose = 10
+				let timeout = 60000
+				if (Object.values(suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.sender))) m.reply(`Selesaikan suit mu yang sebelumnya`)
+				if (m.mentionedJid[0] === m.sender) return m.reply(`Tidak bisa bermain dengan diri sendiri !`)
+				if (!m.mentionedJid[0]) return m.reply(`_Siapa yang ingin kamu tantang?_\nTag orangnya..\n\nContoh : ${prefix}suit @${owner[0]}`, m.chat, { mentions: [owner[1] + '@s.whatsapp.net'] })
+				if (Object.values(suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.mentionedJid[0]))) return m.reply(`Orang yang kamu tantang sedang bermain suit bersama orang lain :(`)
+				let id = 'suit_' + new Date() * 1
+				let caption = `_*SUIT PvP*_\n\n@${m.sender.split`@`[0]} menantang @${m.mentionedJid[0].split`@`[0]} untuk bermain suit\n\nSilahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
+				suit[id] = {
+					chat: m.reply(caption),
+					id: id,
+					p: m.sender,
+					p2: m.mentionedJid[0],
+					status: 'wait',
+					waktu: setTimeout(() => {
+						if (suit[id]) m.reply(`_Waktu suit habis_`)
+						delete suit[id]
+					}, 60000), poin, poin_lose, timeout
+				}
+			}
+			break
+			case 'tebakbom': {
+				if (tebakbom[m.sender]) return m.reply('Masih Ada Sesi Yang Belum Diselesaikan!')
+				tebakbom[m.sender] = {
+					petak: [0, 0, 0, 2, 0, 2, 0, 2, 0, 0].sort(() => Math.random() - 0.5),
+					board: ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'],
+					bomb: 3,
+					lolos: 7,
+					pick: 0,
+					nyawa: ['❤️', '❤️', '❤️'],
+					waktu: setTimeout(() => {
+						if (tebakbom[m.sender]) m.reply(`_Waktu ${command} habis_`)
+						delete tebakbom[m.sender];
+					}, 120000)
+				}
+				m.reply(`*TEBAK BOM*\n\n${tebakbom[m.sender].board.join("")}\n\nPilih lah nomor tersebut! dan jangan sampai terkena Bom!\nBomb : ${tebakbom[m.sender].bomb}\nNyawa : ${tebakbom[m.sender].nyawa.join("")}`);
+			}
+			break
+			case 'tekateki': {
+				if (iGame(tekateki, m.chat)) return m.reply('Masih Ada Sesi Yang Belum Diselesaikan!')
+				const soal = await fetchJson('https://raw.githubusercontent.com/nazedev/database/refs/heads/master/games/tekateki.json');
+				const hasil = pickRandom(soal);
+				let { key } = await m.reply(`🎮 Teka Teki Berikut :\n\n${hasil.soal}\n\nWaktu : 60s\nHadiah *+3499*`)
+				tekateki[m.chat + key.id] = {
+					jawaban: hasil.jawaban.toLowerCase(),
+					id: key.id
+				}
+				await sleep(60000)
+				if (rdGame(tekateki, m.chat, key.id)) {
+					m.reply('Waktu Habis\nJawaban: ' + tekateki[m.chat + key.id].jawaban)
+					delete tekateki[m.chat + key.id]
+				}
+			}
+			break
 case 'ttc':
 case 'ttt':
 case 'tictactoe': {
