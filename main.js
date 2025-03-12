@@ -1678,35 +1678,37 @@ break;
         game(m, budy, command, text, pickRandom, pushname, conn, participants, sender, who, body, sendImageAsUrl);
         break;
 
-// 🎰 Casino - Ruletas y Juegos de Suerte (Usando EXP en lugar de dinero)
+// 🎰 Casino - Ruletas y Juegos de Suerte (Apuesta con Dinero, Gana 3 EXP)
 case 'ruleta':
 case 'ruletas':
 case 'suerte':
 case 'casino':
     if (!global.db.data.users[m.sender]) {
-        global.db.data.users[m.sender] = { exp: 0 }; // Inicializa EXP si no existe
+        global.db.data.users[m.sender] = { exp: 0, uang: 0 }; // Inicializa EXP y Dinero si no existen
     }
 
     let apuesta = parseInt(args[0]);
-    if (isNaN(apuesta) || apuesta <= 0) return m.reply('❌ Ingresa una cantidad válida de EXP para apostar.');
+    if (isNaN(apuesta) || apuesta <= 0) return m.reply('❌ Ingresa una cantidad válida de dinero para apostar.');
 
-    let userExp = global.db.data.users[m.sender].exp;
-    if (apuesta > userExp) return m.reply('❌ No tienes suficiente EXP para apostar.');
+    let userMoney = global.db.data.users[m.sender].uang;
+    if (apuesta > userMoney) return m.reply('❌ No tienes suficiente dinero para apostar.');
 
     // Generar puntos para el jugador y la computadora
     let puntosJugador = Math.floor(Math.random() * 101);
     let puntosComputadora = Math.floor(Math.random() * 101);
 
+    // Apostar restando el dinero del jugador
+    global.db.data.users[m.sender].uang -= apuesta;
+
     // Evaluar el resultado del casino
     if (puntosJugador > puntosComputadora) {
-        let expGanado = apuesta * 2; // El jugador gana el doble de su apuesta
-        global.db.data.users[m.sender].exp += expGanado;
-        m.reply(`💰 Casino 💰\n*Tú:* ${puntosJugador} Punto\n*Computadora:* ${puntosComputadora} Punto\n\n*Tu Ganas*\nObtienes ${expGanado} EXP`);
+        global.db.data.users[m.sender].exp += 3; // Solo gana 3 EXP
+        m.reply(`💰 Casino 💰\n*Tú:* ${puntosJugador} Punto\n*Computadora:* ${puntosComputadora} Punto\n\n*Tu Ganas*\nObtienes 3 EXP`);
     } else if (puntosJugador < puntosComputadora) {
-        global.db.data.users[m.sender].exp -= apuesta;
-        m.reply(`💰 Casino 💰\n*Tú:* ${puntosJugador} Punto\n*Computadora:* ${puntosComputadora} Punto\n\n*Tu PIERDES*\nPerdiste ${apuesta} EXP`);
+        m.reply(`💰 Casino 💰\n*Tú:* ${puntosJugador} Punto\n*Computadora:* ${puntosComputadora} Punto\n\n*Tu PIERDES*\nPerdiste ${apuesta} Dinero`);
     } else {
-        m.reply(`💰 Casino 💰\n*Tú:* ${puntosJugador} Punto\n*Computadora:* ${puntosComputadora} Punto\n\n*Empate*\nRecuperas tu apuesta de ${apuesta} EXP`);
+        global.db.data.users[m.sender].uang += apuesta; // Devuelve el dinero en empate
+        m.reply(`💰 Casino 💰\n*Tú:* ${puntosJugador} Punto\n*Computadora:* ${puntosComputadora} Punto\n\n*Empate*\nRecuperas tu apuesta de ${apuesta} Dinero`);
     }
     break;
     break
