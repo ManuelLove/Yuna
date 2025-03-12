@@ -1005,12 +1005,16 @@ if (roof) {
         let expGanador = 5;
         let expPerdedor = 3;
 
-        if (!tie) {
-            db.users[win].money += premioDinero; // Gana dinero
-            db.users[win].exp += expGanador; // Gana EXP
-            let perdedor = win === roof.p ? roof.p2 : roof.p;
-            db.users[perdedor].exp = Math.max(0, db.users[perdedor].exp - expPerdedor); // Pierde EXP
-        }
+if (!tie) {
+    // Verificar que los jugadores estén en la base de datos
+    if (!db.users[win]) db.users[win] = { exp: 0, money: 0 };
+    let perdedor = win === roof.p ? roof.p2 : roof.p;
+    if (!db.users[perdedor]) db.users[perdedor] = { exp: 0, money: 0 };
+
+    db.users[win].money += premioDinero; // Gana dinero
+    db.users[win].exp += expGanador; // Gana EXP
+    db.users[perdedor].exp = Math.max(0, db.users[perdedor].exp - expPerdedor); // Pierde EXP
+}
 
         // **Mostrar resultados en el grupo**
         let resultadoMsg = `🎮 *Resultados de Suit PvP*\n\n`;
