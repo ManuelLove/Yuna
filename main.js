@@ -1007,39 +1007,59 @@ users[winner].exp += winScore - playScore
 		}
 		
 		// Tebak Bomb
-		let pilih = '🌀', bomb = '💣';
-		if (m.sender in tebakbom) {
-			if (!/^[1-9]|10$/i.test(body) && !isCmd && !isCreator) return !0;
-			if (tebakbom[m.sender].petak[parseInt(body) - 1] === 1) return !0;
-			if (tebakbom[m.sender].petak[parseInt(body) - 1] === 2) {
-				tebakbom[m.sender].board[parseInt(body) - 1] = bomb;
-				tebakbom[m.sender].pick++;
-				naze.sendMessage(m.chat, { react: {text: '❌', key: m.key }})
-				tebakbom[m.sender].bomb--;
-				tebakbom[m.sender].nyawa.pop();
-				let brd = tebakbom[m.sender].board;
-				if (tebakbom[m.sender].nyawa.length < 1) {
-					await m.reply(`*EL JUEGO HA TERMINADO*\nFuiste alcanzado por una bomba\n\n ${brd.join('')}\n\n*Seleccionado :* ${tebakbom[m.sender].pick}\n_Reducción de límite : 1_`);
-					naze.sendMessage(m.chat, { react: { text: '😂', key: m.key }})
-					delete tebakbom[m.sender];
-				} else await m.reply(`*SELECCIONA UN NÚMERO*\n\nFuiste alcanzado por una bomba\n ${brd.join('')}\n\nSeleccionado: ${tebakbom[m.sender].pick}\nVida restante: ${tebakbom[m.sender].nyawa}`);
-				return !0;
-			}
-			if (tebakbom[m.sender].petak[parseInt(body) - 1] === 0) {
-				tebakbom[m.sender].petak[parseInt(body) - 1] = 1;
-				tebakbom[m.sender].board[parseInt(body) - 1] = pilih;
-				tebakbom[m.sender].pick++;
-				tebakbom[m.sender].lolos--;
-				let brd = tebakbom[m.sender].board;
-				if (tebakbom[m.sender].lolos < 1) {
-					db.users[m.sender].uang += 6000
-					await m.reply(`*ERES GRANDE ಠ⁠ᴥ⁠ಠ*\n\n${brd.join('')}\n\n*Seleccionado :* ${tebakbom[m.sender].pick}\n*Vida restante :* ${tebakbom[m.sender].nyawa}\n*Bomba :* ${tebakbom[m.sender].bomb}\nBonificaciones Dinero 💰 *+6000*`);
-					delete tebakbom[m.sender];
-				} else m.reply(`*SELECCIONA UN NÚMERO*\n\n${brd.join('')}\n\nSeleccionado : ${tebakbom[m.sender].pick}\nVida restante : ${tebakbom[m.sender].nyawa}\nBomba : ${tebakbom[m.sender].bomb}`)
-			}
-		}
-//math
-if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
+
+    let pilih = '🌀', bomb = '💣';
+    if (m.sender in tebakbom) {
+        if (!/^[1-9]|10$/i.test(body) && !isCmd && !isCreator) return !0;
+
+        // ✅ Asegurar que el usuario esté registrado antes de modificar su EXP
+        if (!global.db.data.users[m.sender]) {
+            global.db.data.users[m.sender] = { exp: 0 }; // Inicializa el usuario si no existe
+        }
+
+        if (tebakbom[m.sender].petak[parseInt(body) - 1] === 2) {
+            tebakbom[m.sender].board[parseInt(body) - 1] = bomb;
+            tebakbom[m.sender].nyawa.pop(); // Reduce la vida
+
+            if (tebakbom[m.sender].nyawa.length < 1) {
+                let expPerdido = Math.floor(Math.random() * 200) + 100;
+                global.db.data.users[m.sender].exp = Math.max(0, global.db.data.users[m.sender].exp - expPerdido);
+
+                await m.reply(`*¡Game Over! ☠️*
+Fuiste alcanzado por una bomba 💣
+
+${tebakbom[m.sender].board.join('')}
+
+*Seleccionado:* ${tebakbom[m.sender].pick}
+⚠️ *Has perdido ${expPerdido} EXP*`);
+
+                delete tebakbom[m.sender]; // Eliminar la partida después de perder
+            } else {
+                await m.reply(`*SELECCIONA UN NÚMERO*
+Fuiste alcanzado por una bomba
+${tebakbom[m.sender].board.join('')}
+Vida restante: ${tebakbom[m.sender].nyawa.length}`);
+            }
+        }
+
+        if (tebakbom[m.sender].lolos < 1) {
+            let expGanado = Math.floor(Math.random() * 600) + 400;
+            global.db.data.users[m.sender].exp += expGanado;
+
+            await m.reply(`*¡Eres un maestro del TebakBom! 🎉*
+
+${tebakbom[m.sender].board.join('')}
+
+*Seleccionado:* ${tebakbom[m.sender].pick}
+*Vida restante:* ${tebakbom[m.sender].nyawa.length}
+*Bombas:* ${tebakbom[m.sender].bomb}
+
+🎖 *Has ganado ${expGanado} EXP*`);
+
+            delete tebakbom[m.sender]; // Eliminar la partida después de ganar
+        }
+    }
+    if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
 kuis = true
 jawaban = kuismath[m.sender.split('@')[0]]
 if (budy.toLowerCase() == jawaban) {
