@@ -1802,39 +1802,27 @@ break
 				}
 			}
 			break
-			case 'boom': {
-				if (boom[m.sender]) return m.reply('¡Aún quedan sesiones sin terminar!')
-				boom[m.sender] = {
-					petak: [0, 0, 0, 2, 0, 2, 0, 2, 0, 0].sort(() => Math.random() - 0.5),
-					board: ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'],
-					bomb: 3,
-					lolos: 7,
-					pick: 0,
-					nyawa: ['❤️', '❤️', '❤️'],
-					waktu: setTimeout(() => {
-						if (boom[m.sender]) m.reply(`_Waktu ${command} habis_`)
-						delete boom[m.sender];
-					}, 160000)
-				}
-				m.reply(`*ADIVINA LA BOMBA*\n\n${boom[m.sender].board.join("")}\n\n¡Elige ese número! ¡Y no te dejes alcanzar por una bomba!\nBomba : ${boom[m.sender].bomb}\nVida : ${boom[m.sender].nyawa.join("")}`);
-			}
-			break
-			case 'tekateki': {
-				if (iGame(tekateki, m.chat)) return m.reply('Masih Ada Sesi Yang Belum Diselesaikan!')
-				const soal = await fetchJson('https://raw.githubusercontent.com/nazedev/database/refs/heads/master/games/tekateki.json');
-				const hasil = pickRandom(soal);
-				let { key } = await m.reply(`🎮 Teka Teki Berikut :\n\n${hasil.soal}\n\nWaktu : 60s\nHadiah *+3499*`)
-				tekateki[m.chat + key.id] = {
-					jawaban: hasil.jawaban.toLowerCase(),
-					id: key.id
-				}
-				await sleep(60000)
-				if (rdGame(tekateki, m.chat, key.id)) {
-					m.reply('Waktu Habis\nJawaban: ' + tekateki[m.chat + key.id].jawaban)
-					delete tekateki[m.chat + key.id]
-				}
-			}
-			break
+case 'boom': {
+    if (boom[m.sender]) return m.reply('¡Aún quedan sesiones sin terminar!')
+
+    boom[m.sender] = {
+        petak: [0, 0, 0, 2, 0, 2, 0, 2, 0, 0].sort(() => Math.random() - 0.5),
+        board: ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'],
+        bomb: 3,
+        lolos: 7,
+        pick: 0,
+        nyawa: ['❤️', '❤️', '❤️'],
+        waktu: setTimeout(() => {
+            if (boom[m.sender]) {
+                m.reply(`_⏳ Tiempo de ${command} agotado_`)
+                delete boom[m.sender]; // 🔥 Asegurar que la partida se borre si expira el tiempo
+            }
+        }, 120000)
+    }
+    
+    m.reply(`*💣 BOOM - ADIVINA LA BOMBA 💣*\n\n${boom[m.sender].board.join("")}\n\n¡Elige un número! ¡Y no te dejes alcanzar por una bomba!\n\n🔸 Bombas: ${boom[m.sender].bomb}\n❤️ Vidas: ${boom[m.sender].nyawa.join("")}`);
+}
+break;
 case 'ttc':
 case 'ttt':
 case 'tictactoe': {
