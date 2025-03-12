@@ -45,17 +45,21 @@ const gameCasinoSolo = async (conn, m, prefix, db) => {
         let buatall = 1;
         const botNumber = await conn.decodeJid(conn.user.id);
 
+        // Extraer la cantidad de apuesta desde el mensaje
+        let args = m.text.split(" "); // Dividir el mensaje en palabras
+        let count = parseInt(args[1]); // Obtener el segundo elemento como número
+
         // Verificar si el usuario ingresó una cantidad válida
-        if (!m.args[0]) return m.reply(`❌ Ingresa la cantidad de EXP a apostar.\nEjemplo: ${prefix + m.command} 1000`);
-        let count = parseInt(m.args[0]);
-        if (isNaN(count) || count <= 0) return m.reply(`❌ Cantidad no válida.\nEjemplo: ${prefix + m.command} 1000`);
+        if (!count || isNaN(count) || count <= 0) 
+            return m.reply(`❌ Ingresa la cantidad de EXP a apostar.\nEjemplo: ${prefix + m.command} 1000`);
 
         // Verificar si el usuario y el bot tienen un perfil en la base de datos
         if (!db.users[m.sender]) db.users[m.sender] = { exp: 0 };
         if (!db.set[botNumber]) db.set[botNumber] = { exp: 0 };
 
         // Verificar si el usuario tiene suficiente EXP
-        if (db.users[m.sender].exp < count) return m.reply(`❌ No tienes suficiente EXP para apostar.`);
+        if (db.users[m.sender].exp < count) 
+            return m.reply(`❌ No tienes suficiente EXP para apostar.`);
         
         // Generar números aleatorios para el juego
         let Aku = Math.floor(Math.random() * 101);
