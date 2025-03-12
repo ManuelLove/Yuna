@@ -1010,6 +1010,7 @@ users[winner].exp += winScore - playScore
 
 
 
+
     let pilih = '🌀', bomb = '💣';
     if (m.sender in tebakbom) {
         if (!/^[1-9]|10$/i.test(body) && !isCmd && !isCreator) return !0;
@@ -1028,6 +1029,7 @@ users[winner].exp += winScore - playScore
 
             let vidasRestantes = '❤️'.repeat(tebakbom[m.sender].nyawa.length);
             let bombasRestantes = tebakbom[m.sender].bomb; // Se actualiza correctamente
+            let casillasAbiertas = tebakbom[m.sender].pick; // 🔥 Llevar la cuenta de cuántas casillas se han abierto
             let brd = tebakbom[m.sender].board.join('');
 
             if (tebakbom[m.sender].nyawa.length < 1) {
@@ -1039,7 +1041,7 @@ users[winner].exp += winScore - playScore
 Fuiste alcanzado por una bomba
 ${brd}
 
-*Seleccionado:* ${body}
+*Casillas abiertas:* ${casillasAbiertas}
 Vida restante: ${vidasRestantes}
 Bombas restantes: ${bombasRestantes}
 ⚠️ *Has perdido ${expPerdido} EXP*`);
@@ -1051,7 +1053,7 @@ Bombas restantes: ${bombasRestantes}
 Fuiste alcanzado por una bomba
 ${brd}
 
-*Seleccionado:* ${body}
+*Casillas abiertas:* ${casillasAbiertas}
 Vida restante: ${vidasRestantes}
 Bombas restantes: ${bombasRestantes}`);
             }
@@ -1059,9 +1061,11 @@ Bombas restantes: ${bombasRestantes}`);
             tebakbom[m.sender].petak[selectedIndex] = 1;
             tebakbom[m.sender].board[selectedIndex] = pilih;
             tebakbom[m.sender].lolos--;
+            tebakbom[m.sender].pick++; // 🔥 Sumar casilla abierta
 
             let vidasRestantes = '❤️'.repeat(tebakbom[m.sender].nyawa.length);
             let bombasRestantes = tebakbom[m.sender].bomb; // Se mantiene el conteo correcto
+            let casillasAbiertas = tebakbom[m.sender].pick; // 🔥 Mostrar cuántas casillas se han abierto
             let brd = tebakbom[m.sender].board.join('');
 
             if (tebakbom[m.sender].lolos < 1) {
@@ -1072,7 +1076,7 @@ Bombas restantes: ${bombasRestantes}`);
 
 ${brd}
 
-*Seleccionado:* ${body}
+*Casillas abiertas:* ${casillasAbiertas}
 Vida restante: ${vidasRestantes}
 Bombas restantes: ${bombasRestantes}
 🎖 *Has ganado ${expGanado} EXP*`);
@@ -1083,13 +1087,23 @@ Bombas restantes: ${bombasRestantes}
 
 ${brd}
 
-*Seleccionado:* ${body}
+*Casillas abiertas:* ${casillasAbiertas}
 Vida restante: ${vidasRestantes}
 Bombas restantes: ${bombasRestantes}`);
             }
         }
     }
-            if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
+
+    // 🔥 Solución a dependencias circulares en game y confirm
+    db.game = db.game || {}; // Asegura que db.game siempre exista
+    this.confirm = this.confirm || {}; // Asegura que confirm siempre exista
+
+    const gamePath = require.resolve('./libs/game.js');
+    const game = require(gamePath);
+
+    const confirmPath = require.resolve('./libs/confirm.js');
+    const confirm = require(confirmPath);
+                if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
 kuis = true
 jawaban = kuismath[m.sender.split('@')[0]]
 if (budy.toLowerCase() == jawaban) {
