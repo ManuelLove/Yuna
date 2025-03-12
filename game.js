@@ -57,7 +57,7 @@ const gameCasinoSolo = async (conn, m, prefix, db) => {
 			db.users[m.sender].uang -= count * 1
 			db.set[botNumber].uang += count * 1
 			if (Aku > Kamu) {
-				m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu PIERDES*\nPerdiste${count} Dinero`.trim())
+				m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu PIERDES*\nPerdiste ${count} Dinero`.trim())
 			} else if (Aku < Kamu) {
 				db.users[m.sender].uang += count * 2
 				m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu Ganas*\nObtienes ${count * 2} Dinero`.trim())
