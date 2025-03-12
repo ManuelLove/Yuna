@@ -1008,6 +1008,7 @@ users[winner].exp += winScore - playScore
 		
 		// Tebak Bomb
 
+
     let pilih = '🌀', bomb = '💣';
     if (m.sender in tebakbom) {
         if (!/^[1-9]|10$/i.test(body) && !isCmd && !isCreator) return !0;
@@ -1017,49 +1018,73 @@ users[winner].exp += winScore - playScore
             global.db.data.users[m.sender] = { exp: 0 }; // Inicializa el usuario si no existe
         }
 
-        if (tebakbom[m.sender].petak[parseInt(body) - 1] === 2) {
-            tebakbom[m.sender].board[parseInt(body) - 1] = bomb;
+        let selectedIndex = parseInt(body) - 1;
+
+        if (tebakbom[m.sender].petak[selectedIndex] === 2) {
+            tebakbom[m.sender].board[selectedIndex] = bomb;
             tebakbom[m.sender].nyawa.pop(); // Reduce la vida
+
+            let vidasRestantes = '❤️'.repeat(tebakbom[m.sender].nyawa.length);
+            let brd = tebakbom[m.sender].board.join('');
 
             if (tebakbom[m.sender].nyawa.length < 1) {
                 let expPerdido = Math.floor(Math.random() * 200) + 100;
                 global.db.data.users[m.sender].exp = Math.max(0, global.db.data.users[m.sender].exp - expPerdido);
 
-                await m.reply(`*¡Game Over! ☠️*
-Fuiste alcanzado por una bomba 💣
+                await m.reply(`*SELECCIONA UN NÚMERO*
 
-${tebakbom[m.sender].board.join('')}
+Fuiste alcanzado por una bomba
+${brd}
 
-*Seleccionado:* ${tebakbom[m.sender].pick}
+*Seleccionado:* ${body}
+Vida restante: ${vidasRestantes}
 ⚠️ *Has perdido ${expPerdido} EXP*`);
 
                 delete tebakbom[m.sender]; // Eliminar la partida después de perder
             } else {
                 await m.reply(`*SELECCIONA UN NÚMERO*
+
 Fuiste alcanzado por una bomba
-${tebakbom[m.sender].board.join('')}
-Vida restante: ${tebakbom[m.sender].nyawa.length}`);
+${brd}
+
+*Seleccionado:* ${body}
+Vida restante: ${vidasRestantes}`);
             }
-        }
+        } else if (tebakbom[m.sender].petak[selectedIndex] === 0) {
+            tebakbom[m.sender].petak[selectedIndex] = 1;
+            tebakbom[m.sender].board[selectedIndex] = pilih;
+            tebakbom[m.sender].lolos--;
 
-        if (tebakbom[m.sender].lolos < 1) {
-            let expGanado = Math.floor(Math.random() * 600) + 400;
-            global.db.data.users[m.sender].exp += expGanado;
+            let vidasRestantes = '❤️'.repeat(tebakbom[m.sender].nyawa.length);
+            let bombasRestantes = tebakbom[m.sender].bomb;
+            let brd = tebakbom[m.sender].board.join('');
 
-            await m.reply(`*¡Eres un maestro del TebakBom! 🎉*
+            if (tebakbom[m.sender].lolos < 1) {
+                let expGanado = Math.floor(Math.random() * 600) + 400;
+                global.db.data.users[m.sender].exp += expGanado;
 
-${tebakbom[m.sender].board.join('')}
+                await m.reply(`*¡Eres un maestro del TebakBom! 🎉*
 
-*Seleccionado:* ${tebakbom[m.sender].pick}
-*Vida restante:* ${tebakbom[m.sender].nyawa.length}
-*Bombas:* ${tebakbom[m.sender].bomb}
+${brd}
 
+*Seleccionado:* ${body}
+Vida restante: ${vidasRestantes}
+Bombas restantes: ${bombasRestantes}
 🎖 *Has ganado ${expGanado} EXP*`);
 
-            delete tebakbom[m.sender]; // Eliminar la partida después de ganar
+                delete tebakbom[m.sender]; // Eliminar la partida después de ganar
+            } else {
+                await m.reply(`*SELECCIONA UN NÚMERO*
+
+${brd}
+
+*Seleccionado:* ${body}
+Vida restante: ${vidasRestantes}
+Bombas restantes: ${bombasRestantes}`);
+            }
         }
     }
-    if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
+        if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
 kuis = true
 jawaban = kuismath[m.sender.split('@')[0]]
 if (budy.toLowerCase() == jawaban) {
