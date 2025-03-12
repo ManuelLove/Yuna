@@ -1672,21 +1672,30 @@ break;
 
 
     // 📌 Juegos Generales
-    case 'simi':
-    case 'bot':
-    case 'pregunta':
-    case 'preg':
-    case 'gay':
-    case 'pareja':
-    case 'formarpareja':
-    case 'top':
-    case 'topgays':
-    case 'topotakus':
-    case 'racista':
-    case 'love':
-    case 'ship':
-    case 'formartrio':
-    case 'formapareja5':
+case 'simi':
+case 'bot':
+case 'pregunta':
+case 'preg':
+case 'gay':
+case 'pareja':
+case 'formarpareja':
+case 'follar':
+case 'violar':
+case 'coger':
+case 'doxear':
+case 'doxxeo':
+case 'personalidad':
+case 'top':
+case 'topgays':
+case 'topotakus':
+case 'racista':
+case 'love':
+case 'ship':
+case 'formartrio':
+case 'formapareja5':
+case 'ruletas':
+case 'ruleta':
+case 'suerte':
         const { game } = require('./plugins/juegos.js');
         game(m, budy, command, text, pickRandom, pushname, conn, participants, sender, who, body, sendImageAsUrl);
         break;
