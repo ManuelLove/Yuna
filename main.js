@@ -369,12 +369,12 @@ const time = moment(Number(msg.messageTimestamp + "000")).locale("es-mx").tz("Am
 /*const reply = (text) => {  
 m.reply(text)}*/
 let canalId = [
-"120363296103096943@newsletter",
-"120363296103096943@newsletter"
+"",
+""
 ];
 let canalNombre = [
-"✨ 𝐚𝐧𝐬í-𝐁𝐎𝐓 ✨",
-"✨ 𝐚𝐧𝐬í-𝐁𝐎𝐓 ✨"
+"🌹💠Nury-Bot💠🌹",
+"🌹💠Nury-Bot💠🌹✨"
 ];
 
 async function getRandomChannel() {
