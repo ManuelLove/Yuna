@@ -943,7 +943,6 @@ users[winner].exp += winScore - playScore
 }
 }
 // 🎮 Suit PvP - Verifica registro y muestra resultados correctamente
-case 'suitpvp': {
     let roof = Object.values(suitpvp).find(roof => roof.id && roof.status && [roof.p, roof.p2].includes(m.sender));
     if (roof) {
         let win = '';
