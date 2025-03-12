@@ -1009,6 +1009,7 @@ users[winner].exp += winScore - playScore
 		// Tebak Bomb
 
 
+
     let pilih = '🌀', bomb = '💣';
     if (m.sender in tebakbom) {
         if (!/^[1-9]|10$/i.test(body) && !isCmd && !isCreator) return !0;
@@ -1023,8 +1024,10 @@ users[winner].exp += winScore - playScore
         if (tebakbom[m.sender].petak[selectedIndex] === 2) {
             tebakbom[m.sender].board[selectedIndex] = bomb;
             tebakbom[m.sender].nyawa.pop(); // Reduce la vida
+            tebakbom[m.sender].bomb--; // 🔥 Ahora se reduce correctamente el número de bombas restantes
 
             let vidasRestantes = '❤️'.repeat(tebakbom[m.sender].nyawa.length);
+            let bombasRestantes = tebakbom[m.sender].bomb; // Se actualiza correctamente
             let brd = tebakbom[m.sender].board.join('');
 
             if (tebakbom[m.sender].nyawa.length < 1) {
@@ -1038,6 +1041,7 @@ ${brd}
 
 *Seleccionado:* ${body}
 Vida restante: ${vidasRestantes}
+Bombas restantes: ${bombasRestantes}
 ⚠️ *Has perdido ${expPerdido} EXP*`);
 
                 delete tebakbom[m.sender]; // Eliminar la partida después de perder
@@ -1048,7 +1052,8 @@ Fuiste alcanzado por una bomba
 ${brd}
 
 *Seleccionado:* ${body}
-Vida restante: ${vidasRestantes}`);
+Vida restante: ${vidasRestantes}
+Bombas restantes: ${bombasRestantes}`);
             }
         } else if (tebakbom[m.sender].petak[selectedIndex] === 0) {
             tebakbom[m.sender].petak[selectedIndex] = 1;
@@ -1056,7 +1061,7 @@ Vida restante: ${vidasRestantes}`);
             tebakbom[m.sender].lolos--;
 
             let vidasRestantes = '❤️'.repeat(tebakbom[m.sender].nyawa.length);
-            let bombasRestantes = tebakbom[m.sender].bomb;
+            let bombasRestantes = tebakbom[m.sender].bomb; // Se mantiene el conteo correcto
             let brd = tebakbom[m.sender].board.join('');
 
             if (tebakbom[m.sender].lolos < 1) {
@@ -1084,7 +1089,7 @@ Bombas restantes: ${bombasRestantes}`);
             }
         }
     }
-        if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
+            if (kuismath.hasOwnProperty(m.sender.split('@')[0]) && isCmd) {
 kuis = true
 jawaban = kuismath[m.sender.split('@')[0]]
 if (budy.toLowerCase() == jawaban) {
