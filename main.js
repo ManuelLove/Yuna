@@ -1000,8 +1000,8 @@ users[winner].exp += winScore - playScore
 				else if (k.test(stage) && g.test(stage2)) win = roof.p2
 				else if (stage == stage2) tie = true
 				db.users[roof.p == win ? roof.p : roof.p2].limit += tie ? 0 : 3
-				db.users[roof.p == win ? roof.p : roof.p2].uang += tie ? 0 : 3000
-				naze.sendMessage(roof.asal, { text: `_*Resultados Suit*_${tie ? '\nEmpate' : ''}\n\n@${roof.p.split`@`[0]} (${roof.text}) ${tie ? '' : roof.p == win ? ` Ganar \n` : ` Perdido \n`}\n@${roof.p2.split`@`[0]} (${roof.text2}) ${tie ? '' : roof.p2 == win ? ` Ganar \n` : ` Perdido \n`}\n\nEl ganador obtiene\n*Premio :* Dinero(3000) y límite(3)`.trim(), mentions: [roof.p, roof.p2] }, { quoted: m })
+				db.users[roof.p == win ? roof.p : roof.p2].exp += tie ? 0 : 3000
+				naze.sendMessage(roof.asal, { text: `_*Resultados Suit*_${tie ? '\nEmpate' : ''}\n\n@${roof.p.split`@`[0]} (${roof.text}) ${tie ? '' : roof.p == win ? ` Ganar \n` : ` Perdido \n`}\n@${roof.p2.split`@`[0]} (${roof.text2}) ${tie ? '' : roof.p2 == win ? ` Ganar \n` : ` Perdido \n`}\n\nEl ganador obtiene\n*Premio :* EXP(3000) y límite(3)`.trim(), mentions: [roof.p, roof.p2] }, { quoted: m })
 				delete suitpvp[roof.id]
 			}
 		}
@@ -1657,33 +1657,54 @@ await delay(5 * 1000);
 }
 break;
 
-//juegos  
-case 'simi':
-case 'bot':
-case 'pregunta':
-case 'preg':
-case 'gay':
-case 'pareja':
-case 'formarpareja':
-case 'follar':
-case 'violar':
-case 'coger':
-case 'doxear':
-case 'doxxeo':
-case 'personalidad':
-case 'top':
-case 'topgays':
-case 'topotakus':
-case 'racista':
-case 'love':
-case 'ship':
-case 'formartrio':
-case 'formapareja5':
-case 'ruletas':
-case 'ruleta':
-case 'suerte':
-game(m, budy, command, text, pickRandom, pushname, conn, participants, sender, who, body, sendImageAsUrl)
-break
+
+    // 📌 Juegos Generales
+    case 'simi':
+    case 'bot':
+    case 'pregunta':
+    case 'preg':
+    case 'gay':
+    case 'pareja':
+    case 'formarpareja':
+    case 'top':
+    case 'topgays':
+    case 'topotakus':
+    case 'racista':
+    case 'love':
+    case 'ship':
+    case 'formartrio':
+    case 'formapareja5':
+        const { game } = require('./plugins/juegos.js');
+        game(m, budy, command, text, pickRandom, pushname, conn, participants, sender, who, body, sendImageAsUrl);
+        break;
+
+    // 🎰 Casino - Ruletas y Juegos de Suerte (Usando EXP en lugar de EXP)
+    case 'ruleta':
+    case 'ruletas':
+    case 'suerte':
+    case 'casino':
+        if (!global.db.data.users[m.sender]) {
+            global.db.data.users[m.sender] = { exp: 0 }; // Inicializa EXP si no existe
+        }
+        
+        let apuesta = parseInt(args[0]);
+        if (isNaN(apuesta) || apuesta <= 0) return m.reply('❌ Ingresa una cantidad válida de EXP para apostar.');
+
+        let userExp = global.db.data.users[m.sender].exp;
+        if (apuesta > userExp) return m.reply('❌ No tienes suficiente EXP para apostar.');
+
+        let resultado = Math.random() < 0.5 ? 'ganaste' : 'perdiste';
+        let expGanado = Math.floor(Math.random() * 500) + 200; // Rango de 200 a 500 EXP
+
+        if (resultado === 'ganaste') {
+            global.db.data.users[m.sender].exp += expGanado;
+            m.reply(`🎉 ¡Ganaste en el casino! Has ganado *${expGanado} EXP*.`);
+        } else {
+            global.db.data.users[m.sender].exp -= apuesta;
+            m.reply(`😢 Perdiste *${apuesta} EXP* en el casino.`);
+        }
+        break;
+    break
 case 'verdad':
 case 'reto':
 case 'piropo':
@@ -3009,7 +3030,7 @@ const profileText = `
 🌟 *Nivel:* ${user.level}
 💎 *Exp:* ${user.exp}
 🛡️ *Rol:* ${user.role}
-💰 *Dinero:* ${user.money}
+💰 *EXP:* ${user.money}
 🏦 *Banco:* ${user.banco}
 💎 *Diamantes:* ${user.diamonds}
 🕰️ *Registrado desde:* ${new Date(user.regTime).toLocaleString()}

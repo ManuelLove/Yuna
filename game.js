@@ -27,7 +27,7 @@ const gameSlot = async (conn, m, db) => {
 			let sloth =`[  🎰VIRTUAL SLOT 🎰  ]\n------------------------\n\n${listSlot1}\n${listSlot2} <=====\n${listSlot3}\n\n------------------------\n[  🎰 VIRTUAL SLOT 🎰  ]\n\n*Información* :\n_Tu Ganas🎉_ <=====Limit + ${randomLimit}, Dinero + ${randomLimit * 500}`
 			conn.sendMessage(m.chat, { text: sloth }, { quoted: m })
 			db.users[m.sender].limit += randomLimit
-			db.users[m.sender].uang += randomLimit * 500
+			db.users[m.sender].exp += randomLimit * 500
 		} else {
 			db.users[m.sender].limit -= 1
 			db.set[botNumber].limit += 1
@@ -49,20 +49,20 @@ const gameCasinoSolo = async (conn, m, prefix, db) => {
 		let Aku = (randomaku * 1)
 		let Kamu = (randomkamu * 1)
 		let count = m.args[0]
-		count = count ? 'all' === count ? Math.floor(db.users[m.sender].uang / buatall) : parseInt(count) : m.args[0] ? parseInt(m.args[0]) : 1
+		count = count ? 'all' === count ? Math.floor(db.users[m.sender].exp / buatall) : parseInt(count) : m.args[0] ? parseInt(m.args[0]) : 1
 		count = Math.max(1, count)
 		if (m.args.length < 1) return m.reply(prefix + 'casino <jumlah>\n' + prefix + 'casino 1000')
 		if (isNaN(m.args[0])) return m.reply(`¡Ingrese el monto!\nEjemplo : ${prefix + m.command} 1000`)
-		if (db.users[m.sender].uang >= count * 1) {
-			db.users[m.sender].uang -= count * 1
+		if (db.users[m.sender].exp >= count * 1) {
+			db.users[m.sender].exp -= count * 1
 			db.set[botNumber].uang += count * 1
 			if (Aku > Kamu) {
-				m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu PIERDES*\nPerdiste ${count} Dinero`.trim())
+				m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu PIERDES*\nPerdiste EXP ${count} Dinero`.trim())
 			} else if (Aku < Kamu) {
-				db.users[m.sender].uang += count * 2
+				db.users[m.sender].exp += count * 2
 				m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*Tu Ganas*\nObtienes ${count * 2} Dinero`.trim())
 			} else {
-				db.users[m.sender].uang += count * 1
+				db.users[m.sender].exp += count * 1
 				m.reply(`💰 Casino 💰\n*Tú:* ${Kamu} Punto\n*Computadora:* ${Aku} Punto\n\n*EMPATE*\nObtienes ${count * 1} Dinero`.trim())
 			}
 		} else {
@@ -87,7 +87,7 @@ const gameMerampok = async (m, db) => {
 		if (!db.users[who]) return m.reply('¡El objetivo no está registrado en la base de datos!')
 		if (10000 > db.users[who].uang) return m.reply('El objetivo es Kismin ngab🗿')
 		db.users[who].uang -= dapat
-		db.users[m.sender].uang += dapat
+		db.users[m.sender].exp += dapat
 		db.users[m.sender].lastrampok = new Date * 1
 		m.reply(`Robó con éxito al objetivo dinero por valor de ${dapat}`)
 	} else {
@@ -113,12 +113,12 @@ const gameBegal = async (conn, m, db) => {
 		} else if (teksnya.no === 1) {
 			await m.reply({ text: teksnya.teks, edit: key })
 			await m.reply(`Kamu Di Bunuh Oleh Pemain\nUang Kamu Di Rampas Sebesar *${randomUang}*`)
-			db.users[m.sender].uang -= randomUang
+			db.users[m.sender].exp -= randomUang
 			db.set[botNumber].uang += randomUang * 1
 		} else {
 			await m.reply({ text: teksnya.teks, edit: key })
 			await m.reply(`Berhasil Mendapatkan Uang Sebesar : *${randomUang}*`)
-			db.users[m.sender].uang += randomUang
+			db.users[m.sender].exp += randomUang
 			db.users[m.sender].lastbegal = new Date * 1
 		}
 	} else {
@@ -134,7 +134,7 @@ const daily = async (m, db) => {
 	if (new Date - user.lastclaim > 86400000) {
 		m.reply(`*Daily Claim*\n_Berhasil Claim_\n- limit : 10\n- uang : 10000\n\n_Claim Di Reset_`)
 		db.users[m.sender].limit += 10
-		db.users[m.sender].uang += 10000
+		db.users[m.sender].exp += 10000
 		db.users[m.sender].lastclaim = new Date * 1
 	} else {
 		m.reply(`Silahkan tunggu *⏱️${timers}* lagi untuk bisa mengclaim lagi`)
@@ -145,12 +145,12 @@ const buy = async (m, args, db) => {
 	if (args[0] === 'limit') {
 		if (!args[1]) return m.reply(`Masukkan Nominalnya!\nExample : ${m.prefix + m.command} limit 10`);
 		let count = parseInt(args[1])
-		if (db.users[m.sender].uang >= count * 1) {
+		if (db.users[m.sender].exp >= count * 1) {
 			db.users[m.sender].limit += count * 1
-			db.users[m.sender].uang -= count * 500
+			db.users[m.sender].exp -= count * 100
 			m.reply(`Berhasil Membeli Limit Sebanyak ${args[1] * 1} dengan harga ${args[1] * 500}`);
 		} else {
-			m.reply(`Uang Kamu Tidak Cukup Untuk Membeli limit!\nUangmu Tersisa : ${db.users[m.sender].uang}\nHarga ${args[1]} Limit : ${args[1] * 500}`);
+			m.reply(`Uang Kamu Tidak Cukup Untuk Membeli limit!\nUangmu Tersisa : ${db.users[m.sender].exp}\nHarga ${args[1]} Limit : ${args[1] * 500}`);
 		}
 	} else {
 		m.reply(`Harga Limit : Jumlah x 500\n• 1 limit = 500\n• 2 limit = 1000\n\nExample : .buy limit 3`);
@@ -161,7 +161,7 @@ const setLimit = (m, db) => db.users[m.sender].limit -= 1
 
 const addLimit = (jumlah, no, db) => db.users[no].limit += parseInt(jumlah)
 
-const setUang = (m, db) => db.users[m.sender].uang -= 1000
+const setUang = (m, db) => db.users[m.sender].exp -= 1000
 
 const addUang = (jumlah, no, db) => db.users[no].uang += parseInt(jumlah)
 
@@ -191,17 +191,17 @@ const transfer = async (m, args, db) => {
 		let who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : args[1] ? (args[1].replace(/[^0-9]/g, '') + '@s.whatsapp.net') : false
 		if (!who) return m.reply('Siapa yg mau di transfer?')
 		if (db.users[who]) {
-			if (db.users[m.sender].uang >= count * 1) {
+			if (db.users[m.sender].exp >= count * 1) {
 				try {
-					db.users[m.sender].uang -= count * 1
+					db.users[m.sender].exp -= count * 1
 					db.users[who].uang += count * 1
 					m.reply(`Berhasil mentransfer uang sebesar ${count}, kepada @${who.split('@')[0]}`)
 				} catch (e) {
-					db.users[m.sender].uang += count * 1
+					db.users[m.sender].exp += count * 1
 					m.reply('Gagal Transfer')
 				}
 			} else {
-				m.reply(`Uang tidak mencukupi!!\Uang mu tersisa : *${db.users[m.sender].uang}*`)
+				m.reply(`Uang tidak mencukupi!!\Uang mu tersisa : *${db.users[m.sender].exp}*`)
 			}
 		} else m.reply(`Nomer ${who.split('@')[0]} Bukan User bot!`)
 	} else {
