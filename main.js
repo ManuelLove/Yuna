@@ -159,8 +159,8 @@ enable
 } = require('./plugins/enable.js')
 //global.db.data.sticker = global.db.data.sticker || {} 
 db.game = db.game || {}; // Asegura que db.game exista
-db.game.suit = db.game.suit || []; // Asegura que suit exista
-let suit = db.game.suit;
+db.game.suitpvp = db.game.suitpvp || []; // Asegura que suitpvp exista
+let suitpvp = db.game.suitpvp;
 let tebakbom = db.game.tebakbom = []
 let user = global.db.data.users[m.sender]
 let tebaklagu = global.db.data.game.tebaklagu = []
@@ -943,14 +943,14 @@ users[winner].exp += winScore - playScore
 }
 }
 		// Suit PvP
-		let roof = Object.values(suit).find(roof => roof.id && roof.status && [roof.p, roof.p2].includes(m.sender))
+		let roof = Object.values(suitpvp).find(roof => roof.id && roof.status && [roof.p, roof.p2].includes(m.sender))
 		if (roof) {
 			let win = ''
 			let tie = false
 			if (m.sender == roof.p2 && /^(acc(ept)?|aceptar|gas|oke?|rechazar|gamau|nanti|ga(k.)?bisa|y)/i.test(m.text) && m.isGroup && roof.status == 'wait') {
 				if (/^(rechazar|gamau|nanti|n|ga(k.)?bisa)/i.test(m.text)) {
-					m.reply(`@${roof.p2.split`@`[0]} rechazar suit,\nsuit cancelado`)
-					delete suit[roof.id]
+					m.reply(`@${roof.p2.split`@`[0]} rechazar suitpvp,\nsuitpvp cancelado`)
+					delete suitpvp[roof.id]
 					return !0
 				}
 				roof.status = 'play';
@@ -965,7 +965,7 @@ users[winner].exp += winScore - playScore
 						win = !roof.pilih ? roof.p2 : roof.p
 						m.reply(`@${(roof.pilih ? roof.p2 : roof.p).split`@`[0]} no elijas un suit, el juego termina`)
 					}
-					delete suit[roof.id]
+					delete suitpvp[roof.id]
 					return !0
 				}, roof.timeout)
 			}
@@ -1002,7 +1002,7 @@ users[winner].exp += winScore - playScore
 				db.users[roof.p == win ? roof.p : roof.p2].limit += tie ? 0 : 3
 				db.users[roof.p == win ? roof.p : roof.p2].uang += tie ? 0 : 3000
 				naze.sendMessage(roof.asal, { text: `_*Resultados Suit*_${tie ? '\nEmpate' : ''}\n\n@${roof.p.split`@`[0]} (${roof.text}) ${tie ? '' : roof.p == win ? ` Ganar \n` : ` Perdido \n`}\n@${roof.p2.split`@`[0]} (${roof.text2}) ${tie ? '' : roof.p2 == win ? ` Ganar \n` : ` Perdido \n`}\n\nEl ganador obtiene\n*Premio :* Dinero(3000) y límite(3)`.trim(), mentions: [roof.p, roof.p2] }, { quoted: m })
-				delete suit[roof.id]
+				delete suitpvp[roof.id]
 			}
 		}
 		
@@ -1666,31 +1666,31 @@ break
 				await gameCasinoSolo(naze, m, prefix, db)
 			}
 			break
-			case 'suitpvp': case 'suit': {
+			case 'suitpvp': case 'suitpvp': {
 				let poin = 10
 				let poin_lose = 10
 				let timeout = 60000
-				if (Object.values(suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.sender))) m.reply(`Selesaikan suit mu yang sebelumnya`)
-				if (m.mentionedJid[0] === m.sender) return m.reply(`Tidak bisa bermain dengan diri sendiri !`)
-				if (!m.mentionedJid[0]) return m.reply(`_Siapa yang ingin kamu tantang?_\nTag orangnya..\n\nContoh : ${prefix}suit @${owner[0]}`, m.chat, { mentions: [owner[1] + '@s.whatsapp.net'] })
-				if (Object.values(suit).find(roof => roof.id.startsWith('suit') && [roof.p, roof.p2].includes(m.mentionedJid[0]))) return m.reply(`Orang yang kamu tantang sedang bermain suit bersama orang lain :(`)
-				let id = 'suit_' + new Date() * 1
-				let caption = `_*SUIT PvP*_\n\n@${m.sender.split`@`[0]} menantang @${m.mentionedJid[0].split`@`[0]} untuk bermain suit\n\nSilahkan @${m.mentionedJid[0].split`@`[0]} untuk ketik terima/tolak`
-				suit[id] = {
+				if (Object.values(suitpvp).find(roof => roof.id.startsWith('suitpvp') && [roof.p, roof.p2].includes(m.sender))) m.reply(`Termina tu traje anterior`)
+				if (m.mentionedJid[0] === m.sender) return m.reply(`¡No puedo jugar conmigo mismo!`)
+				if (!m.mentionedJid[0]) return m.reply(`_¿A quién quieres desafiar?_\nEtiqueta a la persona..\n\nEjemplo : ${prefix}suitpvp @${owner[0]}`, m.chat, { mentions: [owner[1] + '@s.whatsapp.net'] })
+				if (Object.values(suitpvp).find(roof => roof.id.startsWith('suitpvp') && [roof.p, roof.p2].includes(m.mentionedJid[0]))) return m.reply(`La persona a la que estás desafiando está jugando con otra persona :(`)
+				let id = 'suitpvp_' + new Date() * 1
+				let caption = `_*SUIT PvP*_\n\n@${m.sender.split`@`[0]} desafío @${m.mentionedJid[0].split`@`[0]} jugar al Suit\n\nPor favor @${m.mentionedJid[0].split`@`[0]} escribir aceptar/rechazar`
+				suitpvp[id] = {
 					chat: m.reply(caption),
 					id: id,
 					p: m.sender,
 					p2: m.mentionedJid[0],
 					status: 'wait',
 					waktu: setTimeout(() => {
-						if (suit[id]) m.reply(`_Waktu suit habis_`)
-						delete suit[id]
+						if (suitpvp[id]) m.reply(`_Waktu suit habis_`)
+						delete suitpvp[id]
 					}, 60000), poin, poin_lose, timeout
 				}
 			}
 			break
 			case 'tebakbom': {
-				if (tebakbom[m.sender]) return m.reply('Masih Ada Sesi Yang Belum Diselesaikan!')
+				if (tebakbom[m.sender]) return m.reply('¡Aún quedan sesiones sin terminar!')
 				tebakbom[m.sender] = {
 					petak: [0, 0, 0, 2, 0, 2, 0, 2, 0, 0].sort(() => Math.random() - 0.5),
 					board: ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟'],
@@ -1701,9 +1701,9 @@ break
 					waktu: setTimeout(() => {
 						if (tebakbom[m.sender]) m.reply(`_Waktu ${command} habis_`)
 						delete tebakbom[m.sender];
-					}, 120000)
+					}, 160000)
 				}
-				m.reply(`*TEBAK BOM*\n\n${tebakbom[m.sender].board.join("")}\n\nPilih lah nomor tersebut! dan jangan sampai terkena Bom!\nBomb : ${tebakbom[m.sender].bomb}\nNyawa : ${tebakbom[m.sender].nyawa.join("")}`);
+				m.reply(`*ADIVINA LA BOMBA*\n\n${tebakbom[m.sender].board.join("")}\n\n¡Elige ese número! ¡Y no te dejes alcanzar por una bomba!\nBomba : ${tebakbom[m.sender].bomb}\nVida : ${tebakbom[m.sender].nyawa.join("")}`);
 			}
 			break
 			case 'tekateki': {
