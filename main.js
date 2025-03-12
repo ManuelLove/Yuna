@@ -1006,14 +1006,17 @@ if (roof) {
         let expPerdedor = 3;
 
         if (!tie) {
-            // Verificar que los jugadores estén en la base de datos
-            if (!db.users[win]) db.users[win] = { exp: 0, money: 0 };
-            let perdedor = win === roof.p ? roof.p2 : roof.p;
-            if (!db.users[perdedor]) db.users[perdedor] = { exp: 0, money: 0 };
+            let winner = win === roof.p ? roof.p : roof.p2;
+            let loser = win === roof.p ? roof.p2 : roof.p;
 
-            db.users[win].money += premioDinero; // Gana dinero
-            db.users[win].exp += expGanador; // Gana EXP
-            db.users[perdedor].exp = Math.max(0, db.users[perdedor].exp - expPerdedor); // Pierde EXP
+            // Asegurar que los jugadores existen en la base de datos
+            if (!global.db.data.users[winner]) global.db.data.users[winner] = { exp: 0, money: 0 };
+            if (!global.db.data.users[loser]) global.db.data.users[loser] = { exp: 0, money: 0 };
+
+            // Actualizar recompensas de manera segura
+            global.db.data.users[winner].money = (global.db.data.users[winner].money || 0) + premioDinero;
+            global.db.data.users[winner].exp = (global.db.data.users[winner].exp || 0) + expGanador;
+            global.db.data.users[loser].exp = Math.max(0, (global.db.data.users[loser].exp || 0) - expPerdedor);
         }
 
         // **Mostrar resultados en el grupo**
