@@ -2385,99 +2385,176 @@ id: "D5AF8EE6BA12D89F26A198255855ADDC",
 }, { quoted: m });
 break
 }           
-case 'menu': {
-m.react('✨') 
-const platform = os.platform();
-const uptime = os.uptime();
-const totalMem = os.totalmem();
-const freeMem = os.freemem();
-const usedMem = totalMem - freeMem;
-
-const formatUptime = (uptime) => {
-const hours = Math.floor(uptime / 3600);
-const minutes = Math.floor((uptime % 3600) / 60);
-return `${hours}h ${minutes}m`;
-};
-const ramUsage = (usedMem / (1024 * 1024)).toFixed(2);
-const totalRam = (totalMem / (1024 * 1024)).toFixed(2);
-if (global.db.data.users[m.sender].banned) return 
-let user = global.db.data.users[m.sender]
-let totalreg = Object.keys(global.db.data.users).length
-let rtotalreg = Object.values(global.db.data.users).filter(user => user.registered == true).length
-const date = moment.tz('America/Bogota').format('DD/MM/YYYY')
-const time = moment.tz('America/Argentina/Buenos_Aires').format('LT')
-let wa = m.key.id.length > 21 ? 'Android' : m.key.id.substring(0, 2) == '3A' ? 'IOS' : 'whatsapp web'
-let img = ["https://i.ibb.co/ccm5zLLF/9a94e27e0367.jpg", "https://i.ibb.co/vCGDxQvd/ef24ae34d0d3.jpg", "https://i.ibb.co/prrdDRjq/c352e0cd4f02.jpg", "https://i.ibb.co/hFSf2nKD/743508fd2f8b.jpg"][Math.floor(Math.random() * 4)];
-let emoji = ["🌠", "✨", "🌟", "💫", "🌌", "🌙", "🌕", "🌖", "🌗", "🌘", "🌑", "🌒", "🌓", "🌔"][Math.floor(Math.random() * 14)];
-let menu = `
-> 𖦼 𝙲𝚛𝚎𝚊𝚍𝚘𝚛 ${creador} ↲  
-> 𖦼 Menú [ ${prefix} ] ↲  
-> 𖦼 Fecha: ${date} ↲  
-> 𖦼 Hora: ${time} ↲  
-> 𖦼 Versión: ${vs} ↲  
-> 𖦼 Usuarios registrados: ${Object.keys(global.db.data.users).length} ↲  
-> 𖦼 Tiempo activo: ${runtime(process.uptime())} ↲  
-> 𖦼 Modo: ${conn.public ? 'Público' : 'Privado'} ↲  
-> 𖦼 Plataforma: ${platform} ↲  
-> 𖦼 RAM usada: ${ramUsage} MB de ${totalRam} MB ↲  
-> 𖦼 CPU: ${os.cpus().length} núcleos ↲  
-> 𖦼 Bot: ${conn.user.id == global.numBot2 ? 'Principal' : `Secundario de  @${global.numBot.split`@`[0]}`} ↲ 
-> *𖨠𖨠⌎API⌏𖨠𖨠*
-> _「eliasaryt.short.gy/api 」_
-> COMANDOS PARA USTED ${emoji}
-> 𖦼 ${prefix}allmenu 𖧹 menucompleto ↲  
-> 𖦼 ${prefix}menu1 𖧹 descarga ↲  
-> 𖦼 ${prefix}menu2 𖧹 audio ↲  
-> 𖦼 ${prefix}menu3 𖧹 menugrupos ↲  
-> 𖦼 ${prefix}menu4 𖧹 menubuscadores ↲  
-> 𖦼 ${prefix}menu5 𖧹 menujuegos ↲  
-> 𖦼 ${prefix}menu6 𖧹 menuefecto ↲  
-> 𖦼 ${prefix}menu7 𖧹 menuconvertidores ↲  
-> 𖦼 ${prefix}menu8 𖧹 menurandom ↲  
-> 𖦼 ${prefix}menu9 𖧹 menuRPG ↲  
-> 𖦼 ${prefix}menu10 𖧹 menuSticker ↲  
-> 𖦼 ${prefix}menu11 𖧹 menuOwner ↲  
-> 𖦼 ${prefix}menu18 𖧹 menuhorny ↲  
-> 𖦼 ${prefix}logos ↲  
-
-> 𖦼 ${prefix}estado ↲  
-> 𖦼 ${prefix}nuevo ↲  
-> 𖦼 ${prefix}reglas ↲  
-> 𖦼 ${prefix}ping ↲  
-> 𖦼 ${prefix}velocidad ↲  
-> 𖦼 ${prefix}grupos ↲  
-> 𖦼 ${prefix}join ↲  
-> 𖦼 ${prefix}owner ↲  
-> 𖦼 ${prefix}creador ↲  
-> 𖦼 ${prefix}instalarbot ↲  
-> 𖦼 ${prefix}solicitud ↲  
-> 𖦼 ${prefix}cuenta ↲  
-> 𖦼 ${prefix}cuentaoficiales ↲  
-> 𖦼 ${prefix}status ↲  
-> 𖦼 ${prefix}enable ↲  
-> 𖦼 ${prefix}configurar ↲  
-> 𖦼 ${prefix}report ↲
-`
-conn.sendMessage(m.chat, {
-    text: menu,
-    linkPreview: true,
-    contextInfo: {
-        mentionedJid: [],
-        forwardingScore: 0,
-        isForwarded: false,
-        remoteJid: null,
-        externalAdReply: {
-            title: `ᴀɴsɪ-ʙᴏᴛ/ɴᴏᴄᴛᴜʀɴᴇ ${emoji}`,
-            body: null,
-            mediaType: 1,
-            previewType: 0,
-            showAdAttribution: false,
-            renderLargerThumbnail: true,
-            thumbnailUrl: img,
-        }
+      case 'menu': {
+    updatePopularCommand(command); // Mencatat command
+    const reactEmojis = ["⏳", "🕛", "🕒", "🕕", "🕘", "🕛", "✅", "⭐"];
+    // Mengirimkan reaksi secara berurutan
+    for (const emoji of reactEmojis) {
+        await sho.sendMessage(m.chat, {
+            react: {
+                text: emoji,
+                key: m.key
+            }
+        });
     }
-}, { quoted: m });
-break;
+
+    // Ambil database limit dari `cekfire`
+    const db = loadUserFire();
+    let userLimit = db[m.sender]?.limit || 0; // Jika tidak ada data, default 0
+    let role = db[m.sender]?.role || 'user'; // Default role adalah user
+    let limitDisplay = userLimit === -1 ? 'Unlimited ♾️' : userLimit; // Tampilkan limit sebagai "Unlimited" jika -1
+
+    // Ambil top 4 command populer
+    let commands = Object.entries(popularData).filter(([cmd]) => cmd !== 'ai')
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 4)
+        .map(([cmd, count]) => `${c}${prefix}${cmd} ${count}${c}`);
+    let formattedCommandList = commands.length
+        ? commands.reduce((rows, current, index) => {
+            if (index % 2 === 0) {
+                rows.push([current]);
+            } else {
+                rows[rows.length - 1].push(current);
+            }
+            return rows;
+        }, []).map(row => row.join(` ${c}|${c} `))
+        .join('\n')
+        : 'Belum ada data command populer.';
+
+    let aiMessage = popularData.ai ? `${c}${popularData.ai}${c}` : `${c}null${c}`;
+    const statusUser = isOwner ? '👑 Owner Sho' : `🔑 Role: ${role}`;
+
+    // Format menu dengan limit
+    const shomenu = `Halo @${m.sender.split('@')[0]} 👋🏻
+
+⭐ Bot Name : ${namabot}
+👑 Owner : ${namaowner}
+⏰ Runtime : ${runtime(os.uptime())}
+🔖 Status : ${statusUser}
+🔑 Limit : ${limitDisplay}
+📚 Library : _Baileys x ShoBotz_
+📍 Mode : ${sho.public ? 'public👥' : 'self👤'}
+
+💧 AI HITS : ${aiMessage}
+
+⚡ TOP COMMAND :
+${formattedCommandList}
+
+🔍 LIST MENU
+> Pilih list menu dibawah ini
+
+> ${c}SUPPORTED${c}
+> ${prefix}tqto
+> ${prefix}realown
+
+`;
+        await reply('Menampilkan menu sho')
+        let msg = generateWAMessageFromContent(m.chat, {
+          viewOnceMessage: {
+            message: {
+              "messageContextInfo": {
+                "deviceListMetadata": {},
+                "deviceListMetadataVersion": 2
+              },
+              interactiveMessage: proto.Message.InteractiveMessage.create({
+                body: proto.Message.InteractiveMessage.Body.create({
+                  text: shomenu
+                }),
+                footer: proto.Message.InteractiveMessage.Footer.create({
+                  text: namabot
+                }),
+                header: proto.Message.InteractiveMessage.Header.create({
+                  ...(await prepareWAMessageMedia({
+                    image: fs.readFileSync('./shoMedia/image/owner.jpg')
+                  }, {
+                    upload: sho.waUploadToServer
+                  })),
+                  title: ``,
+                  gifPlayback: true,
+                  subtitle: namaowner,
+                  hasMediaAttachment: false
+                }),
+                nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
+                  buttons: [{
+                    "name": "single_select",
+                    "buttonParamsJson": `{
+      "title": "Click Here ⎙",
+      "sections": [
+        {
+          "title": "Select Menu",
+          "highlight_label": "Sho Botz🍄",
+          "rows": [
+            {
+              "title": "🔍 ALL MENU",
+              "description": "Menampilkan semua menu",
+              "id": "${prefix}allmenu"
+            },
+            {
+              "title": "⬇️ DOWNLOAD MENU",
+              "description": "Menu untuk mendownload dan mencari",
+              "id": "${prefix}downloadmenu"
+            },
+            {
+              "title": "📚 OTHER MENU",
+              "description": "Other menu",
+              "id": "${prefix}othermenu"
+            },
+            {
+              "title": "🔥 OWNER MENU",
+              "description": "Hanya King👑 yang boleh menggunakan command ini",
+              "id": "${prefix}ownermenu"
+            },
+            {
+              "title": "🔮 AI MENU",
+              "description": "Menu Artificial intelligence free",
+              "id": "${prefix}aimenu"
+            },
+            {
+              "title": "🎤 AUDIO MENU",
+              "description": "Menu untuk merubah audio",
+              "id": "${prefix}audiomenu"
+            },
+            {
+              "title": "🔄 CONVERT MENU",
+              "description": "Menu untuk converter",
+              "id": "${prefix}convertmenu"
+            },
+            {
+              "title": "🫧 GROUP MENU",
+              "description": "Menu tentang group",
+              "id": "${prefix}groupmenu"
+            }
+          ]
+        }
+      ]
+    }`
+                  }, {
+                    "name": "cta_url",
+                    "buttonParamsJson": `{
+      "display_text": "King👑",
+      "url": "https://wa.me/${nomerOwner}"
+    }`
+                  }],
+                }),
+                contextInfo: {
+                  mentionedJid: [m.sender],
+                  forwardingScore: 999,
+                  isForwarded: true,
+                  forwardedNewsletterMessageInfo: {
+                    newsletterJid: idsaluran,
+                    newsletterName:  `${namaBot} ${randomEmoji}`,
+                    serverMessageId: 143
+                  }
+                }
+              })
+            }
+          },
+        }, {})
+        await sho.relayMessage(msg.key.remoteJid, msg.message, {
+          messageId: msg.key.id
+        })
+      }
+      break;
 }            
 
 case 'cosplay': {
