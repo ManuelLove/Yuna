@@ -5576,3 +5576,100 @@ console.log(chalk.redBright(`Update ${__filename}`))
 delete require.cache[file]
 require(file)
 })
+
+
+// --- INTEGRACIÓN DE SPIDERX PARA PLAY ---
+
+const fetch = require('node-fetch');
+const yts = require('yt-search');
+
+const API_KEY = 'TU_API_KEY_AQUI';  // 🔴 Reemplaza con tu clave de SpiderX
+
+async function buscarCancionYT(nombre) {
+    try {
+        let resultado = await yts(nombre);
+        if (!resultado.videos.length) throw "❌ No se encontraron resultados.";
+        return resultado.videos[0];  // Devuelve el primer video encontrado
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
+async function getYTVideo(url) {
+    try {
+        let response = await fetch(`https://api.spiderx.com.br/api/downloads/yt-mp4?url=${encodeURIComponent(url)}&api_key=${API_KEY}`);
+        let data = await response.json();
+        if (!data.url) throw "❌ Error al obtener el video.";
+        return data;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
+async function getYTAudio(url) {
+    try {
+        let response = await fetch(`https://api.spiderx.com.br/api/downloads/yt-mp3?url=${encodeURIComponent(url)}&api_key=${API_KEY}`);
+        let data = await response.json();
+        if (!data.url) throw "❌ Error al obtener el audio.";
+        return data;
+    } catch (error) {
+        console.error(error);
+        return null;
+    }
+}
+
+async function playHandler(m, command, text, conn) {
+    if (!text) return m.reply("🔍 *Debes proporcionar un nombre de canción o un enlace de YouTube.*");
+
+    let videoData;
+
+    // Si es un enlace de YouTube, lo usa directamente. Si es un nombre, lo busca.
+    if (text.includes("youtube.com") || text.includes("youtu.be")) {
+        videoData = { url: text, title: "Video proporcionado" };
+    } else {
+        videoData = await buscarCancionYT(text);
+        if (!videoData) return m.reply("⚠️ No se pudo encontrar la canción.");
+    }
+
+    // Opción de audio o video
+    let buttons = [
+        { buttonId: `playmp3 ${videoData.url}`, buttonText: { displayText: "🎵 Audio (MP3)" }, type: 1 },
+        { buttonId: `playmp4 ${videoData.url}`, buttonText: { displayText: "📹 Video (MP4)" }, type: 1 }
+    ];
+
+    let message = {
+        text: `🎵 *Título:* ${videoData.title}
+📺 *Canal:* ${videoData.author.name}
+⏱️ *Duración:* ${videoData.timestamp}
+🔗 *Enlace:* ${videoData.url}`,
+        footer: "Selecciona una opción:",
+        buttons: buttons,
+        headerType: 1
+    };
+
+    await conn.sendMessage(m.chat, message, { quoted: m });
+}
+
+async function enviarAudioVideo(m, command, text, conn) {
+    if (!text) return m.reply("❌ No proporcionaste un enlace.");
+
+    let mediaData = command === 'playmp4' ? await getYTVideo(text) : await getYTAudio(text);
+    if (!mediaData) return m.reply("⚠️ No se pudo descargar el archivo.");
+
+    let mediaType = command === 'playmp4' ? { video: { url: mediaData.url } } : { audio: { url: mediaData.url }, mimetype: 'audio/mp4' };
+
+    await conn.sendMessage(m.chat, mediaType, { quoted: m });
+}
+
+// Integra el comando en la lógica del bot
+switch (command) {
+    case 'play':  // Busca en YouTube y da opción de Audio/Video
+        playHandler(m, command, text, conn);
+        break;
+    case 'playmp3':  // Descarga solo audio
+    case 'playmp4':  // Descarga solo video
+        enviarAudioVideo(m, command, text, conn);
+        break;
+}
