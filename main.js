@@ -369,12 +369,12 @@ const time = moment(Number(msg.messageTimestamp + "000")).locale("es-mx").tz("Am
 /*const reply = (text) => {  
 m.reply(text)}*/
 let canalId = [
-"120363296103096943@newsletter",
-"120363296103096943@newsletter"
+"120363395078160821@g.us",
+"120363395078160821@g.us"
 ];
 let canalNombre = [
-"✨ 𝐚𝐧𝐬í-𝐁𝐎𝐓 ✨",
-"✨ 𝐚𝐧𝐬í-𝐁𝐎𝐓 ✨"
+"🛡️Ciberseguridad~Bot🛡️",
+"🛡️Ciberseguridad~Bot🛡️"
 ];
 
 async function getRandomChannel() {
@@ -516,7 +516,7 @@ if (new Date() * 1 - setting.status > 1000) {
 let uptime = await runtime(process.uptime())
 var timestamp = speed();   
 var latensi = speed() - timestamp 
-let text = [`${lenguaje.Bio.text} ${Object.keys(global.db.data.users).length} ${lenguaje.Bio.text2} ${latensi.toFixed(4)} 🚀`, `${lenguaje.Bio.text3} ${runtime(process.uptime())}\n\n${lenguaje.Bio.text4}`, `${lenguaje.Bio.text5}`, `✨ 𝐚𝐧𝐬í-𝐁𝐎𝐓 ✨ uso: ${conn.public ? 'Publico' : 'Privado'} | ${lenguaje.Bio.text6} ${runtime(process.uptime())} | ${lenguaje.Bio.text7} ${Object.keys(global.db.data.users).length} crador Eliasar YT`]
+let text = [`${lenguaje.Bio.text} ${Object.keys(global.db.data.users).length} ${lenguaje.Bio.text2} ${latensi.toFixed(4)} 🚀`, `${lenguaje.Bio.text3} ${runtime(process.uptime())}\n\n${lenguaje.Bio.text4}`, `${lenguaje.Bio.text5}`, `🛡️Ciberseguridad~Bot🛡️ uso: ${conn.public ? 'Publico' : 'Privado'} | ${lenguaje.Bio.text6} ${runtime(process.uptime())} | ${lenguaje.Bio.text7} ${Object.keys(global.db.data.users).length} crador Eliasar YT`]
 let bio = text[Math.floor(Math.random() * text.length)]
 try {
 await conn.updateProfileStatus(bio)
@@ -1343,8 +1343,8 @@ mentionedJid: [m.sender],
 forwardingScore: 1,
 isForwarded: true,
 forwardedNewsletterMessageInfo: {
-newsletterJid: '120363296103096943@newsletter',
-newsletterName: '✨ 𝐚𝐧𝐬í-𝐁𝐎𝐓 ✨',
+newsletterJid: '120363395078160821@g.us',
+newsletterName: '🛡️Ciberseguridad~Bot🛡️',
 serverMessageId: ''
 }
 }
@@ -2998,7 +2998,7 @@ case 'infohost': {
 conn.sendMessage(m.chat, { text: lenguaje.info.text27(nna, host, dash, paypal, fb),
 contextInfo:{
 forwardedNewsletterMessageInfo: { 
-newsletterJid: '120363301598733462@newsletter', 
+newsletterJid: '120363395078160821@g.us', 
 serverMessageId: '', 
 newsletterName: 'Sky-Ultra-Plus ☁️' },
 forwardingScore: 9999999,
@@ -3643,7 +3643,7 @@ case 'musica': {
   const fetch = require('node-fetch');
   const ytdl = require('./libs/ytdl');
   const yts = require('yt-search');
-  const botNumber = '573012686632@s.whatsapp.net';
+  const botNumber = '573245338996@s.whatsapp.net';
 
   if (!args.length || !/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)/.test(args[0])) {
     return m.reply('Por favor, ingresa un enlace de YouTube válido.');
@@ -3703,9 +3703,9 @@ case 'musica': {
           businessOwnerJid: botNumber
         },
         forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363296103096943@newsletter',
+          newsletterJid: '120363395078160821@g.us',
           serverMessageId: null,
-          newsletterName: '𝒂𝒏𝒔𝒊-𝑩𝑶𝑻-𝑴𝑫'
+          newsletterName: 'BOT-Info'
         }
       }
     }, { quoted: m });
@@ -5102,9 +5102,9 @@ if (media === 'sticker')
 conn.sendFile(m.chat, e, 'sticker.webp', '', m, true, {
 contextInfo: {
 forwardedNewsletterMessageInfo: {
-newsletterJid: '120363296103096943@newsletter',
+newsletterJid: '120363395078160821@g.us',
 serverMessageId: '',
-newsletterName: '✨ 𝐚𝐧𝐬í-𝐁𝐎𝐓 ✨'
+newsletterName: '🛡️Ciberseguridad~Bot🛡️'
 },
 forwardingScore: 9999999,
 isForwarded: true,
@@ -5167,7 +5167,7 @@ let noetiqueta = 'https://qu.ax/lqFC.webp'
 let or = ['texto', 'sticker']; 
 let media = or[Math.floor(Math.random() * 2)]
 if (media === 'sticker')     
-conn.sendFile(m.chat, noetiqueta, 'sticker.webp', '',m, true, { contextInfo: { forwardedNewsletterMessageInfo: { newsletterJid: '120363296103096943@newsletter', serverMessageId: '', newsletterName: '✨ 𝐚𝐧𝐬í-𝐁𝐎𝐓 ✨' }, forwardingScore: 9999999, isForwarded: true, 'forwardingScore': 200, 'isForwarded': false, externalAdReply:{ showAdAttribution: false, title: 'Yo que?', mediaType: 2, sourceUrl: nna, thumbnail: imagen1}}}, { quoted: m, ephemeralExpiration: 24*60*100, disappearingMessagesInChat: 24*60*100})
+conn.sendFile(m.chat, noetiqueta, 'sticker.webp', '',m, true, { contextInfo: { forwardedNewsletterMessageInfo: { newsletterJid: '120363395078160821@g.us', serverMessageId: '', newsletterName: '🛡️Ciberseguridad~Bot🛡️' }, forwardingScore: 9999999, isForwarded: true, 'forwardingScore': 200, 'isForwarded': false, externalAdReply:{ showAdAttribution: false, title: 'Yo que?', mediaType: 2, sourceUrl: nna, thumbnail: imagen1}}}, { quoted: m, ephemeralExpiration: 24*60*100, disappearingMessagesInChat: 24*60*100})
 if (media === 'texto')
 await conn.sendMessage(m.chat, {text: `${pickRandom(['*QUE YO QUE?*', 'Que?'])}`}, {quoted: m, ephemeralExpiration: 24*60*100, disappearingMessagesInChat: 24*60*100})}*/
 
