@@ -3596,7 +3596,7 @@ case 'video': {
 
         m.reply(`🔄 Descargando el video en ${selectedHeight}p, espera...`);
 
-        const videoUrl = `https://api.spiderx.com.br/api/downloads/yt-mp4?api_key=TU_API_KEY?url=${url}&resolution=${selectedHeight}`;
+        const videoUrl = `https://ytdownloader.nvlgroup.my.id/download?url=${url}&resolution=${selectedHeight}`;
 
         await conn.sendMessage(m.chat, {
             video: { url: videoUrl },
@@ -3727,7 +3727,7 @@ m.reply('🔄 Descargando el audio, por favor espera...');
 const videoUrl = args[0];
 
 try {
-const apiUrl = `https://api.spiderx.com.br/api/downloads/yt-mp4?api_key=TU_API_KEY?url=${encodeURIComponent(videoUrl)}`;
+const apiUrl = `https://deliriussapi-oficial.vercel.app/download/ytmp4?url=${encodeURIComponent(videoUrl)}`;
 const apiResponse = await fetch(apiUrl);
 const delius = await apiResponse.json();
 if (!delius || !delius.status) throw new Error();
@@ -3748,14 +3748,14 @@ if (!axeelData || !axeelData.downloads?.url) throw new Error();
 await conn.sendMessage(m.chat, { audio: { url: axeelData.downloads.url }, mimetype: 'audio/mpeg' }, { quoted: m });
 } catch {
 try {
-const siputzxUrl = `https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?url=${encodeURIComponent(videoUrl)}`;
+const siputzxUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(videoUrl)}`;
 const siputzxResponse = await fetch(siputzxUrl);
 const siputzxData = await siputzxResponse.json();
 if (!siputzxData.status || !siputzxData.data?.dl) throw new Error();
 await conn.sendMessage(m.chat, { audio: { url: siputzxData.data.dl }, mimetype: 'audio/mpeg' }, { quoted: m });
 } catch {
 try {
-const ryzenUrl = `https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?url=${encodeURIComponent(videoUrl)}`;
+const ryzenUrl = `https://api.ryzendesu.vip/api/downloader/ytmp3?url=${encodeURIComponent(videoUrl)}`;
 const ryzenResponse = await fetch(ryzenUrl);
 const ryzenData = await ryzenResponse.json();
 if (ryzenData.status === 'tunnel' && ryzenData.url) {
@@ -3766,7 +3766,7 @@ throw new Error();
 }
 } catch {
 try {
-const dorratzUrl = `https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?url=${encodeURIComponent(videoUrl)}`;
+const dorratzUrl = `https://api.dorratz.com/v2/yt-mp3?url=${encodeURIComponent(videoUrl)}`;
 await conn.sendMessage(m.chat, { audio: { url: dorratzUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
 } catch {
 try {
@@ -3778,13 +3778,13 @@ const downloadUrl = await fetchY2mate(videoUrl);
 await conn.sendFile(m.chat, downloadUrl, 'audio.mp3', null, m, false, { mimetype: 'audio/mp4' });
 } catch {
 try {
-const res = await fetch(`https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?apikey=zenkey&url=${videoUrl}`);
+const res = await fetch(`https://api.zenkey.my.id/api/download/ytmp3?apikey=zenkey&url=${videoUrl}`);
 const audioData = await res.json();
 if (!audioData.status || !audioData.result?.downloadUrl) throw new Error();
 await conn.sendMessage(m.chat, { audio: { url: audioData.result.downloadUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
 } catch {
 try {
-const d2 = await fetch(`https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?apikey=adminsepuh&url=${videoUrl}`);
+const d2 = await fetch(`https://exonity.tech/api/ytdlp2-faster?apikey=adminsepuh&url=${videoUrl}`);
 const dp = await d2.json();
 const audiop = dp.result.media.mp3;
 const fileSize = dp.result.media.mp3_size;
@@ -3819,7 +3819,7 @@ m.reply('🔄 Descargando el audio, por favor espera...');
 const videoUrl = args[0];
 
 try {
-const apiUrl = `https://api.spiderx.com.br/api/downloads/yt-mp4?api_key=TU_API_KEY?url=${encodeURIComponent(videoUrl)}`;
+const apiUrl = `https://deliriussapi-oficial.vercel.app/download/ytmp4?url=${encodeURIComponent(videoUrl)}`;
 const apiResponse = await fetch(apiUrl);
 const delius = await apiResponse.json();
 if (!delius || !delius.status) throw new Error();
@@ -3833,14 +3833,14 @@ if (!dl_url) throw new Error();
 await conn.sendFile(m.chat, dl_url, `${videoUrl.split('v=')[1]}.mp3`, null, m, false, { mimetype: 'audio/mp4' });
 } catch {
 try {
-const siputzxUrl = `https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?url=${encodeURIComponent(videoUrl)}`;
+const siputzxUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(videoUrl)}`;
 const siputzxResponse = await fetch(siputzxUrl);
 const siputzxData = await siputzxResponse.json();
 if (!siputzxData.status || !siputzxData.data?.dl) throw new Error();
 await conn.sendMessage(m.chat, { audio: { url: siputzxData.data.dl }, mimetype: 'audio/mpeg' }, { quoted: m });
 } catch {
 try {
-const ryzenUrl = `https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?url=${encodeURIComponent(videoUrl)}`;
+const ryzenUrl = `https://api.ryzendesu.vip/api/downloader/ytmp3?url=${encodeURIComponent(videoUrl)}`;
 const ryzenResponse = await fetch(ryzenUrl);
 const ryzenData = await ryzenResponse.json();
 if (ryzenData.status === 'tunnel' && ryzenData.url) {
@@ -3851,7 +3851,7 @@ throw new Error();
 }
 } catch {
 try {
-const dorratzUrl = `https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?url=${encodeURIComponent(videoUrl)}`;
+const dorratzUrl = `https://api.dorratz.com/v2/yt-mp3?url=${encodeURIComponent(videoUrl)}`;
 await conn.sendMessage(m.chat, { audio: { url: dorratzUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
 } catch {
 try {
@@ -3863,13 +3863,13 @@ const downloadUrl = await fetchY2mate(videoUrl);
 await conn.sendFile(m.chat, downloadUrl, 'audio.mp3', null, m, false, { mimetype: 'audio/mp4' });
 } catch {
 try {
-const res = await fetch(`https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?apikey=zenkey&url=${videoUrl}`);
+const res = await fetch(`https://api.zenkey.my.id/api/download/ytmp3?apikey=zenkey&url=${videoUrl}`);
 const audioData = await res.json();
 if (!audioData.status || !audioData.result?.downloadUrl) throw new Error();
 await conn.sendMessage(m.chat, { audio: { url: audioData.result.downloadUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
 } catch {
 try {
-const d2 = await fetch(`https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?apikey=adminsepuh&url=${videoUrl}`);
+const d2 = await fetch(`https://exonity.tech/api/ytdlp2-faster?apikey=adminsepuh&url=${videoUrl}`);
 const dp = await d2.json();
 const audiop = dp.result.media.mp3;
 const fileSize = dp.result.media.mp3_size;
@@ -4574,7 +4574,7 @@ video = yt_play.all[0]; videoUrl = video.url;
 }
 await conn.sendFile(m.chat, video.thumbnail, 'thumbnail.jpg', `╭──❰ *🎶 ESPERA*... ❱──\n│\n├ 📌 *Título:* ${video.title}\n├ ⏱️ *Duración:* ${video.timestamp}\n│\n╰──────────────\n\n📥 *Por favor, espere mientras se genera el audio...*\n\n⇄ㅤ   ◁ㅤ  ❚❚ㅤ   ▷ㅤ   ↻\nsɪɢᴜᴇᴍᴇ ᴘᴀᴘᴜ 🧑‍💻\n👉 https://tinyurl.com/25xfelmv`, m, null, {});
 try {
-const apiUrl = `https://api.spiderx.com.br/api/downloads/yt-mp4?api_key=TU_API_KEY?url=${encodeURIComponent(videoUrl)}`, apiResponse = await fetch(apiUrl), delius = await apiResponse.json();
+const apiUrl = `https://deliriussapi-oficial.vercel.app/download/ytmp4?url=${encodeURIComponent(videoUrl)}`, apiResponse = await fetch(apiUrl), delius = await apiResponse.json();
 if (!delius || !delius.status) throw new Error();
 const downloadUrl = delius.data.download.url;
 await conn.sendMessage(m.chat, { audio: { url: downloadUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
@@ -4585,12 +4585,12 @@ if (!dl_url) throw new Error();
 await conn.sendFile(m.chat, dl_url, `${video.title}.mp3`, null, m, false, { mimetype: 'audio/mp4' });
 } catch {
 try {
-const siputzxUrl = `https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?url=${encodeURIComponent(videoUrl)}`, siputzxResponse = await fetch(siputzxUrl), siputzxData = await siputzxResponse.json();
+const siputzxUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(videoUrl)}`, siputzxResponse = await fetch(siputzxUrl), siputzxData = await siputzxResponse.json();
 if (!siputzxData.status || !siputzxData.data?.dl) throw new Error();
 await conn.sendMessage(m.chat, { audio: { url: siputzxData.data.dl }, mimetype: 'audio/mpeg' }, { quoted: m });
 } catch {
 try {
-const ryzenUrl = `https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?url=${encodeURIComponent(videoUrl)}`, ryzenResponse = await fetch(ryzenUrl), ryzenData = await ryzenResponse.json();
+const ryzenUrl = `https://api.ryzendesu.vip/api/downloader/ytmp3?url=${encodeURIComponent(videoUrl)}`, ryzenResponse = await fetch(ryzenUrl), ryzenData = await ryzenResponse.json();
 if (ryzenData.status === 'tunnel' && ryzenData.url) {
 const downloadUrl = ryzenData.url;
 await conn.sendMessage(m.chat, { audio: { url: downloadUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
@@ -4599,7 +4599,7 @@ throw new Error();
 }
 } catch {
 try {
-const dorratzUrl = `https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?url=${encodeURIComponent(videoUrl)}`;
+const dorratzUrl = `https://api.dorratz.com/v2/yt-mp3?url=${encodeURIComponent(videoUrl)}`;
 await conn.sendMessage(m.chat, { audio: { url: dorratzUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
 } catch {
 try {
@@ -4611,12 +4611,12 @@ const downloadUrl = await fetchY2mate(videoUrl);
 await conn.sendFile(m.chat, downloadUrl, 'audio.mp3', null, m, false, { mimetype: 'audio/mp4' });
 } catch {
 try {
-const res = await fetch(`https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?apikey=zenkey&url=${videoUrl}`), audioData = await res.json();
+const res = await fetch(`https://api.zenkey.my.id/api/download/ytmp3?apikey=zenkey&url=${videoUrl}`), audioData = await res.json();
 if (!audioData.status || !audioData.result?.downloadUrl) throw new Error();
 await conn.sendMessage(m.chat, { audio: { url: audioData.result.downloadUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
 } catch {
 try {
-const d2 = await fetch(`https://api.spiderx.com.br/api/downloads/yt-mp3?api_key=TU_API_KEY?apikey=adminsepuh&url=${videoUrl}`), dp = await d2.json(), audiop = dp.result.media.mp3, fileSize = dp.result.media.mp3_size;
+const d2 = await fetch(`https://exonity.tech/api/ytdlp2-faster?apikey=adminsepuh&url=${videoUrl}`), dp = await d2.json(), audiop = dp.result.media.mp3, fileSize = dp.result.media.mp3_size;
 if (!audiop) throw new Error();
 if (fileSize > LimitAud) {
 await conn.sendMessage(m.chat, { document: { url: audiop }, mimetype: 'audio/mp3', fileName: `${video.title}.mp3` }, { quoted: m });
