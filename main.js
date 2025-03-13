@@ -3437,7 +3437,6 @@ break;
 }
 
 case 'tiktok': { 
-    const fetch = require('node-fetch');
 
     if (!text) return m.reply('Proporciona un enlace de TikTok válido.');
     const url = args[0];
@@ -3490,7 +3489,6 @@ case 'tiktok': {
 }
 
 case 'musicdltt': {
-    const fetch = require('node-fetch');
 
     if (!text) return m.reply('Proporciona un enlace de TikTok válido.');
     const url = args[0];
@@ -3574,7 +3572,6 @@ mentions: [m.sender],
 }
 
 case 'video': { 
-    const fetch = require('node-fetch');
 
     if (!text) return m.reply('Proporciona un enlace de YouTube válido.');
     const url = args[0];
@@ -3640,7 +3637,6 @@ break;*/
 case 'musica': {
   const fs = require('fs');
   const path = require('path');
-  const fetch = require('node-fetch');
   const ytdl = require('./libs/ytdl');
   const yts = require('yt-search');
   const botNumber = '573245338996@s.whatsapp.net';
@@ -3718,7 +3714,6 @@ case 'musica': {
 }
 
 /*case 'musica': {
-const fetch = require('node-fetch');
 
 if (!args.length || !/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)/.test(args[0])) {
 return m.reply('Por favor, ingresa un enlace de YouTube válido.');
@@ -3810,7 +3805,6 @@ break;
 }
 */
 /*case 'musica': {
-const fetch = require('node-fetch');
 
 if (!args.length || !/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)/.test(args[0])) {
 return m.reply('Por favor, ingresa un enlace de YouTube válido.');
@@ -5580,7 +5574,6 @@ require(file)
 
 // --- INTEGRACIÓN DE SPIDERX PARA PLAY ---
 
-const fetch = require('node-fetch');
 const yts = require('yt-search');
 
 const API_KEY = 'TU_API_KEY_AQUI';  // 🔴 Reemplaza con tu clave de SpiderX
