@@ -5576,3 +5576,50 @@ console.log(chalk.redBright(`Update ${__filename}`))
 delete require.cache[file]
 require(file)
 })
+
+
+const ffmpeg = require('fluent-ffmpeg');
+const fs = require('fs');
+const fetch = require('node-fetch');
+const path = require('path');
+
+async function descargarYConvertirAudio(url, outputFile) {
+    return new Promise(async (resolve, reject) => {
+        try {
+            const response = await fetch(url);
+            const buffer = await response.buffer();
+            const tempFile = path.join(__dirname, 'temp_audio.m4a'); // Archivo temporal
+
+            fs.writeFileSync(tempFile, buffer);
+
+            ffmpeg(tempFile)
+                .toFormat('mp3')
+                .on('end', () => {
+                    resolve(outputFile);
+                    fs.unlinkSync(tempFile); // Eliminar archivo temporal
+                })
+                .on('error', reject)
+                .save(outputFile);
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
+
+async function enviarAudioWhatsApp(conn, chat, url, m) {
+    try {
+        const outputFile = path.join(__dirname, 'audio.mp3');
+        await descargarYConvertirAudio(url, outputFile);
+        
+        await conn.sendMessage(chat, {
+            audio: fs.readFileSync(outputFile),
+            mimetype: 'audio/mpeg',
+            ptt: false // Cambiar a true si se quiere enviar como nota de voz
+        }, { quoted: m });
+
+        fs.unlinkSync(outputFile); // Eliminar archivo final después del envío
+    } catch (error) {
+        console.error("Error al procesar el audio:", error);
+        await conn.sendMessage(chat, { text: "No se pudo procesar el audio." }, { quoted: m });
+    }
+}
