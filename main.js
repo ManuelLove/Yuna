@@ -5578,9 +5578,6 @@ require(file)
 })
 
 
-const fs = require('fs');
-const fetch = require('node-fetch');
-const path = require('path');
 
 async function descargarYConvertirAudio(url, outputFile) {
     return new Promise(async (resolve, reject) => {
