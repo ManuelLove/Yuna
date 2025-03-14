@@ -52,6 +52,7 @@ const os = require('os') // Proporciona información del sistema operativo
 const fs = require('fs') // Trabajar con el sistema de archivos    
 const fetch = require('node-fetch')
 const axios = require('axios')
+const path = require('path')
 const {
 fileURLToPath
 } = require('url')
@@ -680,7 +681,7 @@ quoted: m
 })
 console.log(`Auto sticker detected`)
 } else if (/video/.test(mime)) {
-if ((quoted.msg || quoted).seconds > 25) return reply(lenguaje['smsAutoSicker']())
+if ((quoted.msg || quoted).seconds > 25) return m.reply(lenguaje['smsAutoSicker']())
 let media = await quoted.download()
 await conn.sendVideoAsSticker(m.chat, media, m, {
 packname: global.packname,
@@ -875,7 +876,7 @@ let ok
 let isWin = !1
 let isTie = !1
 let isSurrender = !1
-//reply(`[DEBUG]\n${parseInt(m.text)}`)
+//m.reply(`[DEBUG]\n${parseInt(m.text)}`)
 if (!/^([1-9]|(me)?give up|surr?ender|off|skip)$/i.test(m.text)) return
 isSurrender = !/^[1-9]$/.test(m.text)
 if (m.sender !== room13.game.currentTurn) {
@@ -1312,6 +1313,161 @@ return;
 }
 //ARRANCA LA DIVERSIÓN   
 switch (prefix && command) {
+case 'ytsearch': {
+  updatePopularCommand(command); // Mencatat command
+  if (!text) return m.reply(`Ejemplo : ${prefix + command} historia de anime`);
+  if (!firely(m, '⏳ Tratamiento..')) return; // Jika limit habis, proses berhenti di sini
+
+  try {
+    // Cari hasil di YouTube menggunakan API
+    let search = await yts(text);
+    if (!search.all.length) return m.reply("¡No se encontraron resultados de búsqueda!");
+
+    // Batasi hasil pencarian ke 5 item teratas dan siapkan carousel card
+    const carouselCards = await Promise.all(search.all.slice(0, 5).map(async (video, index) => ({
+      header: {
+        title: `Resultados ${index + 1}`,
+        hasMediaAttachment: true,
+        imageMessage: (await generateWAMessageContent({
+          image: { url: video.thumbnail }
+        }, { upload: conn.waUploadToServer })).imageMessage
+      },
+      body: {
+        text: `🎥 *Título:* ${video.title}\n👁 *Vistas:* ${video.views}\n⏱ *Duración:* ${video.timestamp}\n📆 *Subido:* ${video.ago}\n📝 *Url:* ${video.url}`
+      },
+      footer: {
+        text: `Haga clic en el botón a continuación para ver o copiar el enlace.`
+      },
+      nativeFlowMessage: {
+        buttons: [
+          {
+            "name": "cta_url",
+            "buttonParamsJson": JSON.stringify({
+            "display_text": "VER VÍDEO 🎬",
+            "url": `${video.url}`
+            })
+          },
+          {
+            "name": "cta_copy",
+            "buttonParamsJson": JSON.stringify({
+            "display_text": "COPIAR URL 📝",
+            "copy_code": `${video.url}`
+            })
+          }
+        ]
+      }
+    })));
+
+    // Buat pesan carousel
+    const carouselMessage = generateWAMessageFromContent(m.chat, {
+      viewOnceMessage: {
+        message: {
+          messageContextInfo: {
+            deviceListMetadata: {},
+            deviceListMetadataVersion: 2
+          },
+          interactiveMessage: proto.Message.InteractiveMessage.fromObject({
+            body: {
+              text: `🔎 *Resultados de búsqueda de YouTube para:* _${text}_`
+            },
+            footer: {
+              text: `Bot de YouTube de Techfix Solutions`
+            },
+            header: {
+              hasMediaAttachment: false
+            },
+            carouselMessage: proto.Message.InteractiveMessage.CarouselMessage.fromObject({
+              cards: carouselCards
+            })
+          })
+        }
+      }
+    }, {});
+
+    // Kirim pesan carousel
+    await conn.relayMessage(m.chat, carouselMessage.message, {
+      messageId: carouselMessage.key.id
+    });
+
+  } catch (e) {
+    console.error("Error al procesar la solicitud de búsqueda de YouTube:", e);
+    await conn.sendMessage(m.chat, {
+      text: "❌ Se produjo un error al procesar una búsqueda en YouTube. Por favor inténtalo de nuevo."
+    }, { quoted: m });
+  }
+}
+break;
+
+case 'ytmp3': {
+    console.log("✅ Ejecutando ytmp3 con URL:", text);
+    if (!text) return m.reply("🔹 Debes proporcionar una URL de YouTube.");
+    if (!isUrl(text)) return m.reply("❌ URL no válida.");
+
+    try {
+        let response = await fetch(`https://api.siputzx.my.id/api/d/ytmp3?url=${text}`);
+        let data = await response.json();
+
+        if (data.status && data.data.dl) {
+            const fileUrl = data.data.dl;
+            const fileName = 'audio.mp3';
+            const fixedFileName = 'fixed_audio.mp3';
+            const filePath = `${__dirname}/${fileName}`;
+const fixedFilePath = `${__dirname}/${fixedFileName}`;
+
+            // Descargar el archivo de audio
+            console.log('⏳ Descargando archivo de audio...');
+            const writer = fs.createWriteStream(filePath);
+            const audioResponse = await axios({
+                url: fileUrl,
+                method: 'GET',
+                responseType: 'stream',
+            });
+            audioResponse.data.pipe(writer);
+
+            writer.on('finish', () => {
+                console.log('✅ Archivo descargado. Iniciando conversión...');
+                
+                ffmpeg(filePath)
+                    .toFormat('mp3')
+                    .on('end', () => {
+                        console.log('✅ Conversión completada. Enviando archivo...');
+                        conn.sendMessage(m.chat, {
+                            audio: fs.readFileSync(fixedFilePath),
+                            mimetype: 'audio/mpeg',
+                            fileName: 'audio_fixed.mp3',
+                        }, { quoted: m });
+                    })
+                    .save(fixedFilePath);
+            });
+        } else {
+            m.reply("❌ Error al descargar el audio.");
+        }
+    } catch (err) {
+        console.error("❌ Error en ytmp3:", err);
+        m.reply("❌ Hubo un problema al procesar tu solicitud.");
+    }
+    console.log("✅ Comando ytmp3 finalizado.");
+}
+break;
+
+case 'ytmp4': {
+    console.log("✅ Ejecutando ytmp4 con URL:", text);
+    if (!text) return m.reply("🔹 Debes proporcionar una URL de YouTube.");
+    if (!isUrl(text)) return m.reply("❌ URL no válida.");
+
+    let response = await fetch(`https://api.siputzx.my.id/api/d/ytmp4?url=${text}`);
+    let data = await response.json();
+
+    if (data.status) {
+        m.reply("🎬 Descargando video...");
+        conn.sendMessage(m.chat, { video: { url: data.data.dl } }, { quoted: m });
+    } else {
+        m.reply("❌ Error al descargar el video.");
+    }
+    console.log("✅ Comando ytmp4 finalizado.");
+}
+break;
+
 case 'test': {
 const test = generateWAMessageFromContent(from, {
 viewOnceMessage: {
@@ -2385,176 +2541,99 @@ id: "D5AF8EE6BA12D89F26A198255855ADDC",
 }, { quoted: m });
 break
 }           
-      case 'menu': {
-    updatePopularCommand(command); // Mencatat command
-    const reactEmojis = ["⏳", "🕛", "🕒", "🕕", "🕘", "🕛", "✅", "⭐"];
-    // Mengirimkan reaksi secara berurutan
-    for (const emoji of reactEmojis) {
-        await sho.sendMessage(m.chat, {
-            react: {
-                text: emoji,
-                key: m.key
-            }
-        });
-    }
+case 'menu': {
+m.react('✨') 
+const platform = os.platform();
+const uptime = os.uptime();
+const totalMem = os.totalmem();
+const freeMem = os.freemem();
+const usedMem = totalMem - freeMem;
 
-    // Ambil database limit dari `cekfire`
-    const db = loadUserFire();
-    let userLimit = db[m.sender]?.limit || 0; // Jika tidak ada data, default 0
-    let role = db[m.sender]?.role || 'user'; // Default role adalah user
-    let limitDisplay = userLimit === -1 ? 'Unlimited ♾️' : userLimit; // Tampilkan limit sebagai "Unlimited" jika -1
+const formatUptime = (uptime) => {
+const hours = Math.floor(uptime / 3600);
+const minutes = Math.floor((uptime % 3600) / 60);
+return `${hours}h ${minutes}m`;
+};
+const ramUsage = (usedMem / (1024 * 1024)).toFixed(2);
+const totalRam = (totalMem / (1024 * 1024)).toFixed(2);
+if (global.db.data.users[m.sender].banned) return 
+let user = global.db.data.users[m.sender]
+let totalreg = Object.keys(global.db.data.users).length
+let rtotalreg = Object.values(global.db.data.users).filter(user => user.registered == true).length
+const date = moment.tz('America/Bogota').format('DD/MM/YYYY')
+const time = moment.tz('America/Argentina/Buenos_Aires').format('LT')
+let wa = m.key.id.length > 21 ? 'Android' : m.key.id.substring(0, 2) == '3A' ? 'IOS' : 'whatsapp web'
+let img = ["https://i.ibb.co/ccm5zLLF/9a94e27e0367.jpg", "https://i.ibb.co/vCGDxQvd/ef24ae34d0d3.jpg", "https://i.ibb.co/prrdDRjq/c352e0cd4f02.jpg", "https://i.ibb.co/hFSf2nKD/743508fd2f8b.jpg"][Math.floor(Math.random() * 4)];
+let emoji = ["🌠", "✨", "🌟", "💫", "🌌", "🌙", "🌕", "🌖", "🌗", "🌘", "🌑", "🌒", "🌓", "🌔"][Math.floor(Math.random() * 14)];
+let menu = `
+> 𖦼 𝙲𝚛𝚎𝚊𝚍𝚘𝚛 ${creador} ↲  
+> 𖦼 Menú [ ${prefix} ] ↲  
+> 𖦼 Fecha: ${date} ↲  
+> 𖦼 Hora: ${time} ↲  
+> 𖦼 Versión: ${vs} ↲  
+> 𖦼 Usuarios registrados: ${Object.keys(global.db.data.users).length} ↲  
+> 𖦼 Tiempo activo: ${runtime(process.uptime())} ↲  
+> 𖦼 Modo: ${conn.public ? 'Público' : 'Privado'} ↲  
+> 𖦼 Plataforma: ${platform} ↲  
+> 𖦼 RAM usada: ${ramUsage} MB de ${totalRam} MB ↲  
+> 𖦼 CPU: ${os.cpus().length} núcleos ↲  
+> 𖦼 Bot: ${conn.user.id == global.numBot2 ? 'Principal' : `Secundario de  @${global.numBot.split`@`[0]}`} ↲ 
+> *𖨠𖨠⌎API⌏𖨠𖨠*
+> _「eliasaryt.short.gy/api 」_
+> COMANDOS PARA USTED ${emoji}
+> 𖦼 ${prefix}allmenu 𖧹 menucompleto ↲  
+> 𖦼 ${prefix}menu1 𖧹 descarga ↲  
+> 𖦼 ${prefix}menu2 𖧹 audio ↲  
+> 𖦼 ${prefix}menu3 𖧹 menugrupos ↲  
+> 𖦼 ${prefix}menu4 𖧹 menubuscadores ↲  
+> 𖦼 ${prefix}menu5 𖧹 menujuegos ↲  
+> 𖦼 ${prefix}menu6 𖧹 menuefecto ↲  
+> 𖦼 ${prefix}menu7 𖧹 menuconvertidores ↲  
+> 𖦼 ${prefix}menu8 𖧹 menurandom ↲  
+> 𖦼 ${prefix}menu9 𖧹 menuRPG ↲  
+> 𖦼 ${prefix}menu10 𖧹 menuSticker ↲  
+> 𖦼 ${prefix}menu11 𖧹 menuOwner ↲  
+> 𖦼 ${prefix}menu18 𖧹 menuhorny ↲  
+> 𖦼 ${prefix}logos ↲  
 
-    // Ambil top 4 command populer
-    let commands = Object.entries(popularData).filter(([cmd]) => cmd !== 'ai')
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 4)
-        .map(([cmd, count]) => `${c}${prefix}${cmd} ${count}${c}`);
-    let formattedCommandList = commands.length
-        ? commands.reduce((rows, current, index) => {
-            if (index % 2 === 0) {
-                rows.push([current]);
-            } else {
-                rows[rows.length - 1].push(current);
-            }
-            return rows;
-        }, []).map(row => row.join(` ${c}|${c} `))
-        .join('\n')
-        : 'Belum ada data command populer.';
-
-    let aiMessage = popularData.ai ? `${c}${popularData.ai}${c}` : `${c}null${c}`;
-    const statusUser = isOwner ? '👑 Owner Sho' : `🔑 Role: ${role}`;
-
-    // Format menu dengan limit
-    const shomenu = `Halo @${m.sender.split('@')[0]} 👋🏻
-
-⭐ Bot Name : ${namabot}
-👑 Owner : ${namaowner}
-⏰ Runtime : ${runtime(os.uptime())}
-🔖 Status : ${statusUser}
-🔑 Limit : ${limitDisplay}
-📚 Library : _Baileys x ShoBotz_
-📍 Mode : ${sho.public ? 'public👥' : 'self👤'}
-
-💧 AI HITS : ${aiMessage}
-
-⚡ TOP COMMAND :
-${formattedCommandList}
-
-🔍 LIST MENU
-> Pilih list menu dibawah ini
-
-> ${c}SUPPORTED${c}
-> ${prefix}tqto
-> ${prefix}realown
-
-`;
-        await reply('Menampilkan menu sho')
-        let msg = generateWAMessageFromContent(m.chat, {
-          viewOnceMessage: {
-            message: {
-              "messageContextInfo": {
-                "deviceListMetadata": {},
-                "deviceListMetadataVersion": 2
-              },
-              interactiveMessage: proto.Message.InteractiveMessage.create({
-                body: proto.Message.InteractiveMessage.Body.create({
-                  text: shomenu
-                }),
-                footer: proto.Message.InteractiveMessage.Footer.create({
-                  text: namabot
-                }),
-                header: proto.Message.InteractiveMessage.Header.create({
-                  ...(await prepareWAMessageMedia({
-                    image: fs.readFileSync('./shoMedia/image/owner.jpg')
-                  }, {
-                    upload: sho.waUploadToServer
-                  })),
-                  title: ``,
-                  gifPlayback: true,
-                  subtitle: namaowner,
-                  hasMediaAttachment: false
-                }),
-                nativeFlowMessage: proto.Message.InteractiveMessage.NativeFlowMessage.create({
-                  buttons: [{
-                    "name": "single_select",
-                    "buttonParamsJson": `{
-      "title": "Click Here ⎙",
-      "sections": [
-        {
-          "title": "Select Menu",
-          "highlight_label": "Sho Botz🍄",
-          "rows": [
-            {
-              "title": "🔍 ALL MENU",
-              "description": "Menampilkan semua menu",
-              "id": "${prefix}allmenu"
-            },
-            {
-              "title": "⬇️ DOWNLOAD MENU",
-              "description": "Menu untuk mendownload dan mencari",
-              "id": "${prefix}downloadmenu"
-            },
-            {
-              "title": "📚 OTHER MENU",
-              "description": "Other menu",
-              "id": "${prefix}othermenu"
-            },
-            {
-              "title": "🔥 OWNER MENU",
-              "description": "Hanya King👑 yang boleh menggunakan command ini",
-              "id": "${prefix}ownermenu"
-            },
-            {
-              "title": "🔮 AI MENU",
-              "description": "Menu Artificial intelligence free",
-              "id": "${prefix}aimenu"
-            },
-            {
-              "title": "🎤 AUDIO MENU",
-              "description": "Menu untuk merubah audio",
-              "id": "${prefix}audiomenu"
-            },
-            {
-              "title": "🔄 CONVERT MENU",
-              "description": "Menu untuk converter",
-              "id": "${prefix}convertmenu"
-            },
-            {
-              "title": "🫧 GROUP MENU",
-              "description": "Menu tentang group",
-              "id": "${prefix}groupmenu"
-            }
-          ]
+> 𖦼 ${prefix}estado ↲  
+> 𖦼 ${prefix}nuevo ↲  
+> 𖦼 ${prefix}reglas ↲  
+> 𖦼 ${prefix}ping ↲  
+> 𖦼 ${prefix}velocidad ↲  
+> 𖦼 ${prefix}grupos ↲  
+> 𖦼 ${prefix}join ↲  
+> 𖦼 ${prefix}owner ↲  
+> 𖦼 ${prefix}creador ↲  
+> 𖦼 ${prefix}instalarbot ↲  
+> 𖦼 ${prefix}solicitud ↲  
+> 𖦼 ${prefix}cuenta ↲  
+> 𖦼 ${prefix}cuentaoficiales ↲  
+> 𖦼 ${prefix}status ↲  
+> 𖦼 ${prefix}enable ↲  
+> 𖦼 ${prefix}configurar ↲  
+> 𖦼 ${prefix}report ↲
+`
+conn.sendMessage(m.chat, {
+    text: menu,
+    linkPreview: true,
+    contextInfo: {
+        mentionedJid: [],
+        forwardingScore: 0,
+        isForwarded: false,
+        remoteJid: null,
+        externalAdReply: {
+            title: `ᴀɴsɪ-ʙᴏᴛ/ɴᴏᴄᴛᴜʀɴᴇ ${emoji}`,
+            body: null,
+            mediaType: 1,
+            previewType: 0,
+            showAdAttribution: false,
+            renderLargerThumbnail: true,
+            thumbnailUrl: img,
         }
-      ]
-    }`
-                  }, {
-                    "name": "cta_url",
-                    "buttonParamsJson": `{
-      "display_text": "King👑",
-      "url": "https://wa.me/${nomerOwner}"
-    }`
-                  }],
-                }),
-                contextInfo: {
-                  mentionedJid: [m.sender],
-                  forwardingScore: 999,
-                  isForwarded: true,
-                  forwardedNewsletterMessageInfo: {
-                    newsletterJid: idsaluran,
-                    newsletterName:  `${namaBot} ${randomEmoji}`,
-                    serverMessageId: 143
-                  }
-                }
-              })
-            }
-          },
-        }, {})
-        await sho.relayMessage(msg.key.remoteJid, msg.message, {
-          messageId: msg.key.id
-        })
-      }
-      break;
+    }
+}, { quoted: m });
+break;
 }            
 
 case 'cosplay': {
@@ -3591,384 +3670,9 @@ case 'musicdltt': {
 
     } catch (e) {
         m.reply(`❌ Error: ${e.stack}\n\nNo se pudo descargar la música.`);
-    }
-    break;
-}
-    
-case 'play2':
-case 'play': {
-const yts = require('yt-search'); 
-
-if (!text || text.trim() === '') {
-return m.reply('> 𖦼 *Por favor, ingrese el nombre de una canción o un enlace de YouTube.*');
-}
-
-const query = args.join(' ');
-const yt_play = await yts(query);
-
-if (!yt_play || yt_play.all.length === 0) return m.reply('> 𖦼 No se encontraron resultados para tu búsqueda.');
-
-const firstResult = yt_play.all[0];
-const video = {
-url: firstResult.url,
-title: firstResult.title,
-thumbnail: firstResult.thumbnail || 'default-thumbnail.jpg',
-timestamp: firstResult.timestamp,
-views: firstResult.views || 'N/A' 
-};
-
-await conn.sendMessage(m.chat, {
-image: { url: video.thumbnail },
-caption: `> 𖦼 *TÍTULO:* ${video.title}  
-> 𖦼 *LINK:* ${video.url}  
-> 𖦼 *DURACIÓN:* ${video.timestamp}  
-> 𖦼 *VISTAS:* ${video.views}  
-
-> 𖦼 📥 *Seleccione una opción para continuar...*  
-> 𖦼 ⇄ㅤ   ◁ㅤ  ❚❚ㅤ   ▷ㅤ   ↻  
-
-> 𖦼 *Sígueme papu 🧑‍💻*  
-👉 https://tinyurl.com/25xfelmv`,
-footer: "> 𖦼 𝐛𝐲 𝐄𝐥𝐢𝐚𝐬𝐚𝐫𝐘𝐓 ッ",
-buttons: [
-{
-buttonId: `.video ${video.url}`, 
-buttonText: { 
-displayText: '⇣ 𝗩𝗜𝗗𝗘𝗢 ⇣' 
-}
-}, {
-buttonId: `.musica ${video.url}`, 
-buttonText: {
-displayText: "⇣ 𝗔𝗨𝗗𝗜𝗢 ⇣"
-}
-}
-],
-viewOnce: true,
-headerType: 1,
-mentions: [m.sender],
-}, { quoted: m });
-    break;
-}
-
-case 'video': { 
-    const fetch = require('node-fetch');
-
-    if (!text) return m.reply('Proporciona un enlace de YouTube válido.');
-    const url = args[0];
-
-    if (!url.includes('youtu')) return m.reply('Proporciona un enlace válido de YouTube.');
-
-    m.reply('🔄 Obteniendo información del video...');
-
-    try {
-        const infoResponse = await fetch(`https://ytdownloader.nvlgroup.my.id/info?url=${url}`);
-        const info = await infoResponse.json();
-
-        if (!info.resolutions || info.resolutions.length === 0) {
-            return m.reply('❌ No se encontraron resoluciones disponibles.');
-        }
-
-        const randomResolution = info.resolutions[Math.floor(Math.random() * info.resolutions.length)];
-        const selectedHeight = randomResolution.height;
-
-        m.reply(`🔄 Descargando el video en ${selectedHeight}p, espera...`);
-
-        const videoUrl = `https://ytdownloader.nvlgroup.my.id/download?url=${url}&resolution=${selectedHeight}`;
-
-        await conn.sendMessage(m.chat, {
-            video: { url: videoUrl },
-            caption: `✅ Aquí está tu video en ${selectedHeight}p.`,
-        }, { quoted: m });
-    } catch (e) {
-        m.reply(`❌ Error: ${e.stack}\n\nNo se pudo obtener información del video.`);
-    }
-    break;
-}
-    
-/*case 'video': {
-if (!text) return m.reply('Por favor, proporciona un enlace de YouTube válido.');
-const url = args[0];
-
-if (!url.includes('youtu')) return m.reply('Por favor, proporciona un enlace válido de YouTube.');
-
-m.reply('🔄 Descargando el video, por favor espera...');
-
-try {
-const api = `https://api.siputzx.my.id/api/d/ytmp4?url=${url}`;
-const res = await fetch(api);
-const json = await res.json();
-
-if (json.status) {
-const videoUrl = json.data.dl;
-
-await conn.sendMessage(m.chat, {
-video: { url: videoUrl },
-caption: '✅ Aquí está tu video.',
-}, { quoted: m });
-} else {
-m.reply('❌ Error al descargar el video.');
-}
-} catch (e) {
-m.reply('❌ Hubo un problema al procesar tu solicitud.');
-}
-}
-break;*/
-
-case 'musica': {
-  const fs = require('fs');
-  const path = require('path');
-  const fetch = require('node-fetch');
-  const ytdl = require('./libs/ytdl');
-  const yts = require('yt-search');
-  const botNumber = '573245338996@s.whatsapp.net';
-
-  if (!args.length || !/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)/.test(args[0])) {
-    return m.reply('Por favor, ingresa un enlace de YouTube válido.');
-  }
-
-  m.reply('🔄 Descargando el audio, por favor espera...');
-  const videoUrl = args[0];
-
-  try {
-    const searchResult = await yts({ videoId: videoUrl.split('v=')[1] || videoUrl.split('/').pop() });
-    if (!searchResult || !searchResult.title || !searchResult.thumbnail) {
-      throw new Error('No se pudo obtener la información del video.');
-    }
-
-    const videoInfo = {
-      title: searchResult.title,
-      thumbnail: await (await fetch(searchResult.thumbnail)).buffer()
-    };
-
-    const ytdlResult = await ytdl(videoUrl);
-    if (ytdlResult.status !== 'success' || !ytdlResult.dl) {
-      throw new Error('No se pudo obtener el enlace de descarga.');
-    }
-
-    const tmpDir = path.join(__dirname, 'tmp');
-    if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir);
-
-    const filePath = path.join(tmpDir, `${Date.now()}.mp3`);
-    const response = await fetch(ytdlResult.dl);
-    const buffer = await response.buffer();
-    fs.writeFileSync(filePath, buffer);
-
-    const audioCaption = `🎵 *Título:* ${videoInfo.title}\n🔗 *Enlace:* ${videoUrl}`;
-
-    await conn.sendMessage(m.chat, {
-      audio: fs.readFileSync(filePath),
-      mimetype: 'audio/mpeg',
-      fileName: `${videoInfo.title}.mp3`,
-      caption: audioCaption,
-      thumbnail: videoInfo.thumbnail,
-      contextInfo: {
-        externalAdReply: {
-          containsAutoReply: true,
-          mediaType: 1,
-          mediaUrl: videoUrl,
-          renderLargerThumbnail: false,
-          showAdAttribution: true,
-          sourceUrl: videoUrl,
-          thumbnailUrl: searchResult.thumbnail,
-          title: videoInfo.title,
-          body: 'ᴀɴsɪ-ʙᴏᴛ/ɴᴏᴄᴛᴜʀɴᴇ'
-        },
-        forwardingScore: 9999999,
-        isForwarded: true,
-        mentionedJid: [m.sender],
-        businessMessageForwardInfo: {
-          businessOwnerJid: botNumber
-        },
-        forwardedNewsletterMessageInfo: {
-          newsletterJid: '120363395078160821@newsletter',
-          serverMessageId: null,
-          newsletterName: 'BOT-Info'
-        }
-      }
-    }, { quoted: m });
-
-    fs.unlinkSync(filePath);
-  } catch (error) {
-    await m.reply('Ocurrió un error al intentar descargar el audio.');
   }
   break;
 }
-
-/*case 'musica': {
-const fetch = require('node-fetch');
-
-if (!args.length || !/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)/.test(args[0])) {
-return m.reply('Por favor, ingresa un enlace de YouTube válido.');
-}
-m.reply('🔄 Descargando el audio, por favor espera...');
-const videoUrl = args[0];
-
-try {
-const apiUrl = `https://deliriussapi-oficial.vercel.app/download/ytmp4?url=${encodeURIComponent(videoUrl)}`;
-const apiResponse = await fetch(apiUrl);
-const delius = await apiResponse.json();
-if (!delius || !delius.status) throw new Error();
-const downloadUrl = delius.data.download.url;
-await conn.sendMessage(m.chat, { audio: { url: downloadUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
-} catch {
-try {
-const yt = await ytdl(videoUrl);
-const dl_url = yt.audio['128kbps']?.download();
-if (!dl_url) throw new Error();
-await conn.sendFile(m.chat, dl_url, `${videoUrl.split('v=')[1]}.mp3`, null, m, false, { mimetype: 'audio/mp4' });
-} catch {
-try {
-const axeelUrl = `https://axeel.my.id/api/download/audio?url=${encodeURIComponent(videoUrl)}`;
-const axeelResponse = await fetch(axeelUrl);
-const axeelData = await axeelResponse.json();
-if (!axeelData || !axeelData.downloads?.url) throw new Error();
-await conn.sendMessage(m.chat, { audio: { url: axeelData.downloads.url }, mimetype: 'audio/mpeg' }, { quoted: m });
-} catch {
-try {
-const siputzxUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(videoUrl)}`;
-const siputzxResponse = await fetch(siputzxUrl);
-const siputzxData = await siputzxResponse.json();
-if (!siputzxData.status || !siputzxData.data?.dl) throw new Error();
-await conn.sendMessage(m.chat, { audio: { url: siputzxData.data.dl }, mimetype: 'audio/mpeg' }, { quoted: m });
-} catch {
-try {
-const ryzenUrl = `https://api.ryzendesu.vip/api/downloader/ytmp3?url=${encodeURIComponent(videoUrl)}`;
-const ryzenResponse = await fetch(ryzenUrl);
-const ryzenData = await ryzenResponse.json();
-if (ryzenData.status === 'tunnel' && ryzenData.url) {
-const downloadUrl = ryzenData.url;
-await conn.sendMessage(m.chat, { audio: { url: downloadUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
-} else {
-throw new Error();
-}
-} catch {
-try {
-const dorratzUrl = `https://api.dorratz.com/v2/yt-mp3?url=${encodeURIComponent(videoUrl)}`;
-await conn.sendMessage(m.chat, { audio: { url: dorratzUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
-} catch {
-try {
-const downloadUrl = await fetch9Convert(videoUrl);
-await conn.sendFile(m.chat, downloadUrl, 'audio.mp3', null, m, false, { mimetype: 'audio/mp4' });
-} catch {
-try {
-const downloadUrl = await fetchY2mate(videoUrl);
-await conn.sendFile(m.chat, downloadUrl, 'audio.mp3', null, m, false, { mimetype: 'audio/mp4' });
-} catch {
-try {
-const res = await fetch(`https://api.zenkey.my.id/api/download/ytmp3?apikey=zenkey&url=${videoUrl}`);
-const audioData = await res.json();
-if (!audioData.status || !audioData.result?.downloadUrl) throw new Error();
-await conn.sendMessage(m.chat, { audio: { url: audioData.result.downloadUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
-} catch {
-try {
-const d2 = await fetch(`https://exonity.tech/api/ytdlp2-faster?apikey=adminsepuh&url=${videoUrl}`);
-const dp = await d2.json();
-const audiop = dp.result.media.mp3;
-const fileSize = dp.result.media.mp3_size;
-if (!audiop) throw new Error();
-if (fileSize > LimitAud) {
-await conn.sendMessage(m.chat, { document: { url: audiop }, mimetype: 'audio/mp3', fileName: `${videoUrl.split('v=')[1]}.mp3` }, { quoted: m });
-} else {
-await conn.sendMessage(m.chat, { audio: { url: audiop }, mimetype: 'audio/mpeg' }, { quoted: m });
-}
-} catch {
-await m.reply('Todas las APIs fallaron. No se pudo procesar tu solicitud.');
-}
-}
-}
-}
-}
-}
-}
-}
-}
-}
-break;
-}
-*/
-/*case 'musica': {
-const fetch = require('node-fetch');
-
-if (!args.length || !/^https?:\/\/(www\.)?(youtube\.com|youtu\.be)/.test(args[0])) {
-return m.reply('Por favor, ingresa un enlace de YouTube válido.');
-}
-m.reply('🔄 Descargando el audio, por favor espera...');
-const videoUrl = args[0];
-
-try {
-const apiUrl = `https://deliriussapi-oficial.vercel.app/download/ytmp4?url=${encodeURIComponent(videoUrl)}`;
-const apiResponse = await fetch(apiUrl);
-const delius = await apiResponse.json();
-if (!delius || !delius.status) throw new Error();
-const downloadUrl = delius.data.download.url;
-await conn.sendMessage(m.chat, { audio: { url: downloadUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
-} catch {
-try {
-const yt = await ytdl(videoUrl);
-const dl_url = yt.audio['128kbps']?.download();
-if (!dl_url) throw new Error();
-await conn.sendFile(m.chat, dl_url, `${videoUrl.split('v=')[1]}.mp3`, null, m, false, { mimetype: 'audio/mp4' });
-} catch {
-try {
-const siputzxUrl = `https://api.siputzx.my.id/api/d/ytmp3?url=${encodeURIComponent(videoUrl)}`;
-const siputzxResponse = await fetch(siputzxUrl);
-const siputzxData = await siputzxResponse.json();
-if (!siputzxData.status || !siputzxData.data?.dl) throw new Error();
-await conn.sendMessage(m.chat, { audio: { url: siputzxData.data.dl }, mimetype: 'audio/mpeg' }, { quoted: m });
-} catch {
-try {
-const ryzenUrl = `https://api.ryzendesu.vip/api/downloader/ytmp3?url=${encodeURIComponent(videoUrl)}`;
-const ryzenResponse = await fetch(ryzenUrl);
-const ryzenData = await ryzenResponse.json();
-if (ryzenData.status === 'tunnel' && ryzenData.url) {
-const downloadUrl = ryzenData.url;
-await conn.sendMessage(m.chat, { audio: { url: downloadUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
-} else {
-throw new Error();
-}
-} catch {
-try {
-const dorratzUrl = `https://api.dorratz.com/v2/yt-mp3?url=${encodeURIComponent(videoUrl)}`;
-await conn.sendMessage(m.chat, { audio: { url: dorratzUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
-} catch {
-try {
-const downloadUrl = await fetch9Convert(videoUrl);
-await conn.sendFile(m.chat, downloadUrl, 'audio.mp3', null, m, false, { mimetype: 'audio/mp4' });
-} catch {
-try {
-const downloadUrl = await fetchY2mate(videoUrl);
-await conn.sendFile(m.chat, downloadUrl, 'audio.mp3', null, m, false, { mimetype: 'audio/mp4' });
-} catch {
-try {
-const res = await fetch(`https://api.zenkey.my.id/api/download/ytmp3?apikey=zenkey&url=${videoUrl}`);
-const audioData = await res.json();
-if (!audioData.status || !audioData.result?.downloadUrl) throw new Error();
-await conn.sendMessage(m.chat, { audio: { url: audioData.result.downloadUrl }, mimetype: 'audio/mpeg' }, { quoted: m });
-} catch {
-try {
-const d2 = await fetch(`https://exonity.tech/api/ytdlp2-faster?apikey=adminsepuh&url=${videoUrl}`);
-const dp = await d2.json();
-const audiop = dp.result.media.mp3;
-const fileSize = dp.result.media.mp3_size;
-if (!audiop) throw new Error();
-if (fileSize > LimitAud) {
-await conn.sendMessage(m.chat, { document: { url: audiop }, mimetype: 'audio/mp3', fileName: `${videoUrl.split('v=')[1]}.mp3` }, { quoted: m });
-} else {
-await conn.sendMessage(m.chat, { audio: { url: audiop }, mimetype: 'audio/mpeg' }, { quoted: m });
-}
-} catch {
-await m.reply('Todas las APIs fallaron. No se pudo procesar tu solicitud.');
-}
-}
-}
-}
-}
-}
-}
-}
-}
-break;
-}*/
 
 case 'tiktokserch': {
 const axios = require('axios');
@@ -4912,7 +4616,7 @@ m.reply('Ocurrió un error al consultar la API');
 }
 break;
 case 'addowner': {
-if (!isCreator) return reply(info.owner)
+if (!isCreator) return m.reply(info.owner)
 const who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text ? text.replace(/[^0-9]/g, '') + '@s.whatsapp.net' : false;
 if (!who) return conn.sendTextWithMentions(m.chat, `⚠️ Uso incorrecto del comando.*\n\n*❥ Ejemplo:* ${prefix + command} @0`);
 const nuevoNumero = who;
@@ -4922,7 +4626,7 @@ await m.reply('⚠️ *Nuevo número agregado con éxito a la lista de owners.*'
 break;
 
 case 'delowner': {
-if (!isCreator) return reply(info.owner)
+if (!isCreator) return m.reply(info.owner)
 const who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text ? text.replace(/[^0-9]/g, '') + '@s.whatsapp.net' : false;
 const numeroAEliminar = who;
 const index = global.owner.findIndex(owner => owner[0] === numeroAEliminar);
@@ -5010,7 +4714,7 @@ timeZone: 'Asia/Jakarta'
 break
 
 case 'addprem': {
-if (!isCreator) return reply(info.owner)
+if (!isCreator) return m.reply(info.owner)
 let who
 if (m.isGroup) who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : false
 else who = m.chat
@@ -5026,7 +4730,7 @@ conn.sendTextWithMentions(m.chat, `[ ✅ 𝐏𝐑𝐄𝐌𝐈𝐔𝐌 ✅ ]
 break
 
 case 'delprem': {
-if (!isCreator) return reply(info.owner)
+if (!isCreator) return m.reply(info.owner)
 let who
 if (m.isGroup) who = m.mentionedJid[0] ? m.mentionedJid[0] : m.quoted ? m.quoted.sender : text ? text.replace(/[^0-9]/g, '') + '@s.whatsapp.net' : false
 else who = text ? text.replace(/[^0-9]/g, '') + '@s.whatsapp.net' : m.chat
@@ -5040,7 +4744,7 @@ conn.sendTextWithMentions(m.chat, `@${who.split('@')[0]} Dejarte de ser un usuar
 break
 
 case 'listprem': {
-if (!isCreator) return reply(info.owner)
+if (!isCreator) return m.reply(info.owner)
 let prem = global.premium.map(v => v.replace(/[^0-9]/g, '') + '@s.whatsapp.net').filter(v => v != conn.user.jid)
 let teks = `*[ 𝐔𝐒𝐔𝐀𝐑𝐈𝐎𝐒 𝐏𝐑𝐄𝐌𝐈𝐔𝐌 ]*\n─────────────\n` + prem.map(v => '- @' + v.replace(/@.+/, '')).join`\n`
 conn.sendTextWithMentions(m.chat, teks)
@@ -5087,26 +4791,26 @@ m.reply(from)
 }
 break
 case 'getcase':
-if (!isCreator) return reply(info.owner)
+if (!isCreator) return m.reply(info.owner)
 if (!text) return m.reply(`*Que comando esta buscando o que?*`)
 try {
 bbreak = 'break'
-reply('case ' + `'${args[0]}'` + fs.readFileSync('./main.js').toString().split(`case '${args[0]}'`)[1].split(bbreak)[0] + bbreak)
+m.reply('case ' + `'${args[0]}'` + fs.readFileSync('./main.js').toString().split(`case '${args[0]}'`)[1].split(bbreak)[0] + bbreak)
 } catch (err) {
 console.error(err)
-reply(`Error, tal vez no existe el comando`)
+m.reply(`Error, tal vez no existe el comando`)
 }
 break
 case 'public':
 case 'publico': {
-if (!isCreator) return reply(info.owner)
+if (!isCreator) return m.reply(info.owner)
 conn.public = true
 m.reply(lenguaje.owner.text24)
 }
 break
 case 'self':
 case 'privado': {
-if (!isCreator) return reply(info.owner)
+if (!isCreator) return m.reply(info.owner)
 conn.public = false
 m.reply(lenguaje.owner.text25)
 }
@@ -5115,20 +4819,20 @@ case 'autoadmin':
 case 'tenerpoder': {
 if (!m.isGroup) return m.reply(info.group)
 if (!isBotAdmins) return m.reply(info.botAdmin)
-if (!isCreator) return reply(info.owner)
-reply(`${pickRandom(['Ya eres admin mi jefe 😎', '*LISTO YA ERES ADMIN MI PROPIETARIO/DESARROLLADO 😎*'])}`)
+if (!isCreator) return m.reply(info.owner)
+m.reply(`${pickRandom(['Ya eres admin mi jefe 😎', '*LISTO YA ERES ADMIN MI PROPIETARIO/DESARROLLADO 😎*'])}`)
 await conn.groupParticipantsUpdate(m.chat, [m.sender], "promote")
 }
 break
 case 'leave': {
-if (!isCreator) return reply(info.owner)
-reply(lenguaje.owner.text26)
+if (!isCreator) return m.reply(info.owner)
+m.reply(lenguaje.owner.text26)
 await delay(3 * 3000)
 await conn.groupLeave(m.chat)
 }
 break
 case 'update':
-if (!isCreator) return reply(info.owner)
+if (!isCreator) return m.reply(info.owner)
 try {
 let stdout = execSync('git pull' + (m.fromMe && q ? ' ' + q : ''))
 await m.reply(stdout.toString())
@@ -5653,3 +5357,89 @@ console.log(chalk.redBright(`Update ${__filename}`))
 delete require.cache[file]
 require(file)
 })
+
+
+
+function findRiwayat(idtrx) {
+    const riwayatPath = './database/riwayat.json';
+    const riwayat = JSON.parse(fs.readFileSync(riwayatPath));
+    const transaction = Object.values(riwayat).find(t => t.idtrx === idtrx && t.status === "pending");
+    return transaction;
+}
+
+const idkcl = (length) => {
+    let result = '';
+    const characters = 'abcdefghijklmnopqrstuvwxyz';
+    for(let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+}
+
+const idgede = (length) => {
+    let result = '';
+    const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    for(let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+}
+
+const idnum = (length) => {
+    let result = '';
+    const characters = '1234567890';
+    for(let i = 0; i < length; i++) {
+        result += characters.charAt(Math.floor(Math.random() * characters.length));
+    }
+    return result;
+}
+
+function toRupiah(angka) {
+    var saldo = "";
+    var angkarev = angka.toString().split("").reverse().join("");
+    for(var i = 0; i < angkarev.length; i++)
+        if(i % 3 == 0) saldo += angkarev.substr(i, 3) + ".";
+    return "Rp. " + saldo.split("", saldo.length - 1).reverse().join("");
+}
+
+
+
+function updatePopularCommand(command) {
+    console.log("🔵 Se ejecutó el comando:", command);
+}
+
+
+
+const userFirePath = './database/userFire.json';
+
+function loadUserFire() {
+    if (!fs.existsSync(userFirePath)) {
+        fs.writeFileSync(userFirePath, JSON.stringify({}));
+    }
+    return JSON.parse(fs.readFileSync(userFirePath));
+}
+
+function saveUserFire(db) {
+    fs.writeFileSync(userFirePath, JSON.stringify(db, null, 2));
+}
+
+const firely = (m, teks) => {
+    const db = loadUserFire();
+    const sender = m.sender;
+
+    // Si el usuario no está registrado, asignar un límite predeterminado
+    if (!db[sender]) {
+        db[sender] = { limit: 100 };
+        saveUserFire(db);
+    }
+
+    // Verificar si el usuario tiene límite suficiente
+    if (db[sender].limit <= 0) {
+        m.reply("❌ Has alcanzado tu límite de comandos.");
+        return false;
+    }
+
+    db[sender].limit -= 1;
+    saveUserFire(db);
+    return true;
+};
